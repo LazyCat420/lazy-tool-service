@@ -1,0 +1,36 @@
+{
+  "name": "lazy-tool-service",
+  "version": "0.1.0",
+  "description": "Unified lazy-tool-service that consolidates Python tools and exposes them via REST and MCP SSE",
+  "type": "module",
+  "main": "dist/boot.js",
+  "scripts": {
+    "start": "node dist/boot.js",
+    "dev": "tsx watch src/boot.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "deploy": "bash deploy.sh",
+    "deploy:dry": "bash deploy.sh --dry-run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@rodrigo-barraza/utilities-library": "github:rodrigo-barraza/utilities-library",
+    "express": "^5.2.1",
+    "typescript": "next"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.0",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.22.0",
+    "typescript-eslint": "^8.33.0"
+  }
+}

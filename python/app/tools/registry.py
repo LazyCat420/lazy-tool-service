@@ -57,6 +57,113 @@ class ToolMeta:
     tags: list[str] = field(
         default_factory=list
     )  # Search keywords for future ToolSearch
+    domain: str | None = None
+    labels: list[str] = field(
+        default_factory=list
+    )
+
+
+def get_default_domain_and_labels(tool_name: str) -> tuple[str, list[str]]:
+    # Market Data tools
+    if tool_name in [
+        "get_market_data",
+        "get_finnhub_news",
+        "get_technical_indicators",
+        "get_sec_filings",
+        "get_options_flow",
+        "get_insider_trades",
+        "get_congress_trades",
+        "get_earnings_data",
+        "get_macro_data",
+        "get_finviz_fundamentals",
+        "get_polygon_price_history",
+    ]:
+        return "Market Data", ["market-data", "stock-analysis"]
+
+    # Trading & Execution tools
+    if tool_name in [
+        "buy_stock",
+        "sell_stock",
+        "add_to_watchlist",
+        "remove_from_watchlist",
+        "get_portfolio_state",
+        "get_position_pnl",
+        "get_performance_metrics",
+        "set_price_trigger",
+        "list_active_triggers",
+        "cancel_price_trigger",
+    ]:
+        return "Trading & Execution", ["trading", "execution", "portfolio"]
+
+    # Research & Intelligence tools
+    if tool_name in [
+        "search_web",
+        "web_search",
+        "scrape_url",
+        "query_hermes",
+        "hermes_web_research",
+        "search_internal_database",
+        "browser_navigate",
+        "run_playwright_script",
+        "youtube_search_handle",
+        "youtube_test_channel",
+        "update_youtube_channel_handle",
+    ]:
+        return "Research & Intelligence", ["research", "scraping", "web-search"]
+
+    # Quant & Analytics tools
+    if tool_name in [
+        "run_quant_equation",
+        "execute_momentum_strategy",
+        "execute_value_strategy",
+        "calculate_position_size",
+        "calculate_stop_loss",
+        "calculate_risk_reward",
+        "calculate_portfolio_allocation",
+        "execute_quant_script",
+        "run_python_script",
+    ]:
+        return "Quant & Analytics", ["quant", "analytics", "calculations"]
+
+    # Memory & Knowledge tools
+    if tool_name in [
+        "write_memory_note",
+        "read_memory_note",
+        "search_wiki",
+        "read_profile",
+        "update_preference",
+        "add_agent_note",
+        "search_trading_skills",
+    ]:
+        return "Memory & Knowledge", ["memory", "knowledge", "wiki"]
+
+    # Agent Coordination tools
+    if tool_name in [
+        "post_finding",
+        "read_team_findings",
+        "request_investigation",
+        "check_open_investigations",
+        "get_cycle_context",
+        "get_cycle_context_all",
+    ]:
+        return "Agent Coordination", ["coordination", "teamwork", "cycle-context"]
+
+    # System & Autonomy tools
+    if tool_name in [
+        "run_local_command",
+        "audit_data_quality",
+        "audit_decision_quality",
+        "check_hallucination",
+        "get_strategy_performance",
+        "get_autoresearch_report",
+        "trigger_deep_research",
+        "propose_constitution_amendment",
+        "create_or_update_schedule",
+        "list_active_schedules",
+    ]:
+        return "System & Autonomy", ["system", "autonomy", "audit"]
+
+    return "General", ["tool"]
 
 
 class ToolRegistry:
@@ -80,6 +187,8 @@ class ToolRegistry:
         input_model: type[BaseModel] | None = None,
         concurrency_safe: bool = True,
         tags: list[str] | None = None,
+        domain: str | None = None,
+        labels: list[str] | None = None,
     ):
         """Register an async function as a tool. Can be used as a decorator with or without arguments.
 
@@ -97,6 +206,16 @@ class ToolRegistry:
         def decorator(f: Callable):
             tool_name = name or f.__name__
             self.tools[tool_name] = f
+
+            resolved_domain = domain
+            resolved_labels = labels
+            if resolved_domain is None or resolved_labels is None:
+                def_domain, def_labels = get_default_domain_and_labels(tool_name)
+                if resolved_domain is None:
+                    resolved_domain = def_domain
+                if resolved_labels is None:
+                    resolved_labels = def_labels
+
             self._meta[tool_name] = ToolMeta(
                 tier=tier,
                 source=source,
@@ -106,6 +225,8 @@ class ToolRegistry:
                 input_model=input_model,
                 concurrency_safe=concurrency_safe,
                 tags=tags or [],
+                domain=resolved_domain,
+                labels=resolved_labels,
             )
 
             self.schemas.append(
@@ -266,9 +387,51 @@ class ToolRegistry:
         func_name = function_info.get("name")
         arguments_json = function_info.get("arguments", "{}")
 
-        # ── Parse JSON arguments ──
+        # ── Robust Normalization of Tool Name & Arguments ──
+        if func_name:
+            # Strip trailing tags like </Function
+            if "</" in func_name:
+                func_name = func_name.split("</")[0].strip()
+            
+            # Map capitalized names with spaces/hyphens to registered lowercase snake_case names
+            def clean_str(s: str) -> str:
+                return s.lower().replace(" ", "").replace("_", "").replace("-", "")
+            
+            target_cleaned = clean_str(func_name)
+            matched_name = None
+            for registered_name in self.tools:
+                reg_cleaned = clean_str(registered_name)
+                # Check for exact normalized match
+                if reg_cleaned == target_cleaned:
+                    matched_name = registered_name
+                    break
+                # Check with get_ prefix variation (e.g. "Technical Indicators" -> "get_technical_indicators")
+                if clean_str("get_" + registered_name) == target_cleaned or reg_cleaned == clean_str("get_" + target_cleaned):
+                    matched_name = registered_name
+                    break
+
+            if matched_name:
+                if matched_name != func_name:
+                    logger.info("[ToolRegistry] Normalized tool call name: '%s' -> '%s'", func_name, matched_name)
+                func_name = matched_name
+                # Update function info representation
+                function_info["name"] = func_name
+
+        # ── Parse and Normalize JSON arguments ──
         try:
+            # Clean up trailing tags from arguments string if present
+            if arguments_json and "</" in arguments_json:
+                arguments_json = arguments_json.split("</")[0].strip()
+                
             kwargs = json.loads(arguments_json)
+            
+            # Convert all argument keys to lowercase (e.g. {"Ticker": "IP"} -> {"ticker": "IP"})
+            kwargs = {k.lower(): v for k, v in kwargs.items()}
+            
+            # Update the parsed arguments representation
+            arguments_json = json.dumps(kwargs)
+            function_info["arguments"] = arguments_json
+            
             normalized_args = json.dumps(kwargs, sort_keys=True, separators=(',', ':'))
             cache_key = f"{func_name}:{normalized_args}"
         except Exception as e:
@@ -536,6 +699,8 @@ class ToolRegistry:
                     "concurrency_safe": meta.concurrency_safe,
                     "max_result_chars": meta.max_result_chars,
                     "tags": meta.tags,
+                    "domain": meta.domain,
+                    "labels": meta.labels,
                 }
             )
         return snapshot

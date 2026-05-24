@@ -6,10 +6,70 @@ import logger from "../logger.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const schemasPath = path.resolve(__dirname, "../../tool_schemas.json");
 
-interface ToolSchema {
+export interface ToolParameterProperty {
+  type: string;
+  description?: string;
+  enum?: string[];
+}
+
+export interface ToolParameters {
+  type: string;
+  properties: Record<string, ToolParameterProperty>;
+  required?: string[];
+}
+
+export interface ToolConditionalPath {
+  param: string;
+  template: string;
+}
+
+export interface ToolEndpoint {
+  path: string;
+  method?: "GET" | "POST";
+  queryParams?: string[];
+  pathParams?: string[];
+  bodyParams?: string[];
+  conditionalPath?: ToolConditionalPath;
+}
+
+export interface CachedDataSource {
+  type: "cached";
+  provider: string;
+  intervalSeconds: number;
+}
+
+export interface OnDemandDataSource {
+  type: "onDemand";
+  provider: string;
+}
+
+export interface StaticDataSource {
+  type: "static";
+  provider: string;
+  dataset: string;
+}
+
+export interface ComputeDataSource {
+  type: "compute";
+  provider: string;
+  runtime: string;
+}
+
+export type ToolDataSource = CachedDataSource | OnDemandDataSource | StaticDataSource | ComputeDataSource;
+
+export interface ToolDefinition {
   name: string;
   description: string;
-  parameters: Record<string, any>;
+  dataSource?: ToolDataSource;
+  endpoint?: ToolEndpoint;
+  parameters?: ToolParameters;
+}
+
+export interface ToolSchema extends ToolDefinition {
+  domain: string;
+  labels: string[];
+  emoji: string | null;
+  // Python metadata fields
   tier?: number;
   source?: string;
   permission?: string;
@@ -17,10 +77,6 @@ interface ToolSchema {
   concurrency_safe?: boolean;
   max_result_chars?: number;
   tags?: string[];
-  endpoint?: {
-    path: string;
-    method: string;
-  };
 }
 
 let schemas: ToolSchema[] = [];
@@ -29,14 +85,19 @@ try {
   if (fs.existsSync(schemasPath)) {
     const rawData = fs.readFileSync(schemasPath, "utf-8");
     const list = JSON.parse(rawData);
-    schemas = list.map((item: any) => ({
-      ...item,
-      // Map every tool to a post execution endpoint in lazy-tool-service
-      endpoint: {
-        path: `/execute/${item.name}`,
-        method: "POST"
-      }
-    }));
+    schemas = list.map((item: any) => {
+      return {
+        ...item,
+        domain: item.domain || "General",
+        labels: item.labels || ["tool"],
+        emoji: item.emoji || null,
+        // Map every tool to a post execution endpoint in lazy-tool-service
+        endpoint: item.endpoint || {
+          path: `/execute/${item.name}`,
+          method: "POST"
+        }
+      };
+    });
     logger.success(`Loaded ${schemas.length} tool schemas from tool_schemas.json`);
   } else {
     logger.warn(`tool_schemas.json not found at ${schemasPath}. Run export_tool_schemas.py first.`);

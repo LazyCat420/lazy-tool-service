@@ -12,7 +12,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import {
   getToolSchemas,
-  getToolSchemasForAI,
+  type ToolSchema,
 } from "./ToolSchemaService.js";
 import CONFIG from "../config.js";
 import logger from "../logger.js";
@@ -52,12 +52,14 @@ function createMcpServer() {
   server.setRequestHandler(
     ListToolsRequestSchema,
     async () => {
-      const aiSchemas = getToolSchemasForAI();
+      const fullSchemas = getToolSchemas();
       return {
-        tools: aiSchemas.map((t: Record<string, any>) => ({
+        tools: fullSchemas.map((t: ToolSchema) => ({
           name: t.name,
           description: t.description || "",
           inputSchema: t.parameters || { type: "object", properties: {} },
+          domain: t.domain,
+          labels: t.labels,
         })),
       };
     },

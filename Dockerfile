@@ -33,6 +33,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Fix python symlink for virtualenv compatibility
+RUN ln -sf /usr/bin/python3 /usr/local/bin/python
+
 WORKDIR /app
 
 # Copy python virtual environment

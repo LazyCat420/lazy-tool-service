@@ -20,7 +20,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_finnhub_news",
@@ -43,7 +48,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_technical_indicators",
@@ -66,7 +76,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "write_memory_note",
@@ -99,6 +114,12 @@
       "wiki",
       "note",
       "persist"
+    ],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
     ]
   },
   {
@@ -122,7 +143,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
+    ]
   },
   {
     "name": "search_wiki",
@@ -145,7 +172,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
+    ]
   },
   {
     "name": "run_quant_equation",
@@ -168,7 +201,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "execute_momentum_strategy",
@@ -191,7 +230,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "execute_value_strategy",
@@ -214,7 +259,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "search_web",
@@ -241,7 +292,46 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
+  },
+  {
+    "name": "web_search",
+    "description": "Perform a web search to find recent news or information. Returns top results.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query."
+        },
+        "num_results": {
+          "type": "integer",
+          "description": "Number of results to return (default: 3)."
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "tier": 0,
+    "source": "hermes",
+    "permission": "read_only",
+    "fallback_only": false,
+    "concurrency_safe": true,
+    "max_result_chars": 50000,
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "scrape_url",
@@ -264,7 +354,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "query_hermes",
@@ -287,7 +383,13 @@
     "fallback_only": true,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "hermes_web_research",
@@ -314,7 +416,13 @@
     "fallback_only": true,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "search_internal_database",
@@ -341,7 +449,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "update_youtube_channel_handle",
@@ -369,7 +483,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "run_local_command",
@@ -402,6 +522,12 @@
       "command",
       "execute",
       "system"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -429,7 +555,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "run_playwright_script",
@@ -456,7 +588,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "youtube_search_handle",
@@ -479,7 +617,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "youtube_test_channel",
@@ -502,7 +646,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Research & Intelligence",
+    "labels": [
+      "research",
+      "scraping",
+      "web-search"
+    ]
   },
   {
     "name": "audit_data_quality",
@@ -531,6 +681,12 @@
       "quality",
       "gaps",
       "completeness"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -559,6 +715,12 @@
       "decision",
       "confidence",
       "quality"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -592,6 +754,12 @@
       "verify",
       "fact-check",
       "ground-truth"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -625,6 +793,12 @@
       "history",
       "pnl",
       "win-rate"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -651,6 +825,12 @@
       "report",
       "audit",
       "recommendations"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -684,6 +864,12 @@
       "gaps",
       "collect",
       "autoresearch"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -712,6 +898,12 @@
       "instructions",
       "sector",
       "strategy"
+    ],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
     ]
   },
   {
@@ -761,6 +953,12 @@
       "finding",
       "team",
       "debate"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -799,6 +997,12 @@
       "read",
       "findings",
       "team"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -836,6 +1040,12 @@
       "investigate",
       "delegate",
       "question"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -864,6 +1074,12 @@
       "investigations",
       "open",
       "help"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -880,7 +1096,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
+    ]
   },
   {
     "name": "update_preference",
@@ -896,7 +1118,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
+    ]
   },
   {
     "name": "add_agent_note",
@@ -912,7 +1140,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Memory & Knowledge",
+    "labels": [
+      "memory",
+      "knowledge",
+      "wiki"
+    ]
   },
   {
     "name": "buy_stock",
@@ -939,7 +1173,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
+    ]
   },
   {
     "name": "sell_stock",
@@ -962,7 +1202,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
+    ]
   },
   {
     "name": "add_to_watchlist",
@@ -985,7 +1231,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
+    ]
   },
   {
     "name": "remove_from_watchlist",
@@ -1008,7 +1260,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
+    ]
   },
   {
     "name": "get_sec_filings",
@@ -1030,7 +1288,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_options_flow",
@@ -1052,7 +1315,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_insider_trades",
@@ -1074,7 +1342,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_congress_trades",
@@ -1096,7 +1369,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_earnings_data",
@@ -1118,7 +1396,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_macro_data",
@@ -1134,7 +1417,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_finviz_fundamentals",
@@ -1156,7 +1444,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_polygon_price_history",
@@ -1178,7 +1471,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Market Data",
+    "labels": [
+      "market-data",
+      "stock-analysis"
+    ]
   },
   {
     "name": "get_portfolio_state",
@@ -1199,6 +1497,12 @@
       "positions",
       "cash",
       "pnl"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1227,6 +1531,12 @@
       "pnl",
       "health",
       "stop-loss"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1253,6 +1563,12 @@
       "metrics",
       "win-rate",
       "benchmark"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1296,6 +1612,12 @@
       "amendment",
       "evolution",
       "rules"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -1347,6 +1669,12 @@
       "schedule",
       "autonomy",
       "self-management"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -1366,6 +1694,12 @@
       "schedule",
       "autonomy",
       "status"
+    ],
+    "domain": "System & Autonomy",
+    "labels": [
+      "system",
+      "autonomy",
+      "audit"
     ]
   },
   {
@@ -1431,6 +1765,12 @@
       "stop_loss",
       "take_profit",
       "automation"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1449,6 +1789,12 @@
     "tags": [
       "trigger",
       "status"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1475,6 +1821,12 @@
     "tags": [
       "trigger",
       "cancel"
+    ],
+    "domain": "Trading & Execution",
+    "labels": [
+      "trading",
+      "execution",
+      "portfolio"
     ]
   },
   {
@@ -1513,7 +1865,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "calculate_stop_loss",
@@ -1545,7 +1903,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "calculate_risk_reward",
@@ -1578,7 +1942,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "calculate_portfolio_allocation",
@@ -1613,7 +1983,13 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   },
   {
     "name": "get_cycle_context",
@@ -1641,6 +2017,12 @@
       "capsule",
       "expand",
       "lazy_fetch"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -1674,6 +2056,12 @@
       "capsule",
       "cycle",
       "summary"
+    ],
+    "domain": "Agent Coordination",
+    "labels": [
+      "coordination",
+      "teamwork",
+      "cycle-context"
     ]
   },
   {
@@ -1710,6 +2098,12 @@
       "calculation",
       "sandbox",
       "custom"
+    ],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
     ]
   },
   {
@@ -1726,6 +2120,12 @@
     "fallback_only": false,
     "concurrency_safe": true,
     "max_result_chars": 50000,
-    "tags": []
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
   }
 ]

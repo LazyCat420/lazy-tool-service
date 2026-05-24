@@ -11,14 +11,9 @@ export const executeTool = async (toolName: string, args: Record<string, any>): 
     logger.info(`Spawning Python execution for tool: ${toolName}`);
     
     // Set up environment. Ensure PYTHONPATH is configured so python app can resolve imports.
-    const pythonPath = [
-      "/home/lazycat/github/rods-project/sun/lazy-tool-service/python",
-      "/home/lazycat/github/rods-project/sun/trading-client"
-    ].join(process.platform === "win32" ? ";" : ":");
-
     const env = {
       ...process.env,
-      PYTHONPATH: pythonPath,
+      PYTHONPATH: CONFIG.PYTHONPATH,
       SKIP_TOOL_USAGE_LOG: "true"
     };
 
@@ -26,7 +21,7 @@ export const executeTool = async (toolName: string, args: Record<string, any>): 
       CONFIG.PYTHON_INTERPRETER,
       [CONFIG.PYTHON_EXEC_SCRIPT, toolName, argsJson],
       {
-        cwd: "/home/lazycat/github/rods-project/sun/lazy-tool-service/python",
+        cwd: CONFIG.PYTHON_CWD,
         env
       }
     );

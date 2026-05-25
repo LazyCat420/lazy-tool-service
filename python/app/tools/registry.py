@@ -74,7 +74,6 @@ def get_default_domain_and_labels(tool_name: str) -> tuple[str, list[str]]:
         "get_insider_trades",
         "get_congress_trades",
         "get_earnings_data",
-        "get_macro_data",
         "get_finviz_fundamentals",
         "get_polygon_price_history",
     ]:
@@ -105,7 +104,6 @@ def get_default_domain_and_labels(tool_name: str) -> tuple[str, list[str]]:
         "search_internal_database",
         "browser_navigate",
         "run_playwright_script",
-        "youtube_search_handle",
         "youtube_test_channel",
         "update_youtube_channel_handle",
     ]:
@@ -113,7 +111,6 @@ def get_default_domain_and_labels(tool_name: str) -> tuple[str, list[str]]:
 
     # Quant & Analytics tools
     if tool_name in [
-        "run_quant_equation",
         "execute_momentum_strategy",
         "execute_value_strategy",
         "calculate_position_size",
@@ -151,12 +148,8 @@ def get_default_domain_and_labels(tool_name: str) -> tuple[str, list[str]]:
     # System & Autonomy tools
     if tool_name in [
         "run_local_command",
-        "audit_data_quality",
         "audit_decision_quality",
         "check_hallucination",
-        "get_strategy_performance",
-        "get_autoresearch_report",
-        "trigger_deep_research",
         "propose_constitution_amendment",
         "create_or_update_schedule",
         "list_active_schedules",

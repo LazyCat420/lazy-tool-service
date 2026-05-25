@@ -181,93 +181,6 @@
     ]
   },
   {
-    "name": "run_quant_equation",
-    "description": "Run a specific quantitative/mathematical equation. Useful for verifying margins, P/E variants, or backing up claims with rigid calculations.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "equation": {
-          "type": "string",
-          "description": "The math expression (e.g. '(2.45 - 1.1) / 5.0' or '15.4 * log(2)')."
-        }
-      },
-      "required": [
-        "equation"
-      ]
-    },
-    "tier": 0,
-    "source": "computed",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [],
-    "domain": "Quant & Analytics",
-    "labels": [
-      "quant",
-      "analytics",
-      "calculations"
-    ]
-  },
-  {
-    "name": "execute_momentum_strategy",
-    "description": "Evaluates the stock using a quantitative momentum strategy. Checks RSI, MACD, and moving averages to output a momentum score and signal.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ticker": {
-          "type": "string",
-          "description": "The stock ticker symbol"
-        }
-      },
-      "required": [
-        "ticker"
-      ]
-    },
-    "tier": 0,
-    "source": "computed",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [],
-    "domain": "Quant & Analytics",
-    "labels": [
-      "quant",
-      "analytics",
-      "calculations"
-    ]
-  },
-  {
-    "name": "execute_value_strategy",
-    "description": "Evaluates the stock using a quantitative value strategy. Checks P/E, PEG, P/B, and Debt/Equity to output a value score and signal.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ticker": {
-          "type": "string",
-          "description": "The stock ticker symbol"
-        }
-      },
-      "required": [
-        "ticker"
-      ]
-    },
-    "tier": 0,
-    "source": "computed",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [],
-    "domain": "Quant & Analytics",
-    "labels": [
-      "quant",
-      "analytics",
-      "calculations"
-    ]
-  },
-  {
     "name": "query_hermes",
     "description": "Send a task or query to the local Hermes intelligence model. Subject to guardrails.",
     "parameters": {
@@ -327,6 +240,64 @@
       "research",
       "scraping",
       "web-search"
+    ]
+  },
+  {
+    "name": "execute_momentum_strategy",
+    "description": "Evaluates the stock using a quantitative momentum strategy. Checks RSI, MACD, and moving averages to output a momentum score and signal.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "description": "The stock ticker symbol"
+        }
+      },
+      "required": [
+        "ticker"
+      ]
+    },
+    "tier": 0,
+    "source": "computed",
+    "permission": "read_only",
+    "fallback_only": false,
+    "concurrency_safe": true,
+    "max_result_chars": 50000,
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
+    ]
+  },
+  {
+    "name": "execute_value_strategy",
+    "description": "Evaluates the stock using a quantitative value strategy. Checks P/E, PEG, P/B, and Debt/Equity to output a value score and signal.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "description": "The stock ticker symbol"
+        }
+      },
+      "required": [
+        "ticker"
+      ]
+    },
+    "tier": 0,
+    "source": "computed",
+    "permission": "read_only",
+    "fallback_only": false,
+    "concurrency_safe": true,
+    "max_result_chars": 50000,
+    "tags": [],
+    "domain": "Quant & Analytics",
+    "labels": [
+      "quant",
+      "analytics",
+      "calculations"
     ]
   },
   {
@@ -397,35 +368,6 @@
     ]
   },
   {
-    "name": "youtube_search_handle",
-    "description": "Search for the correct YouTube channel handle (e.g. @markets) given a channel name or old handle.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "string",
-          "description": "The name or old handle of the YouTube channel (e.g., 'Bloomberg Television' or 'FundstratTomLee')."
-        }
-      },
-      "required": [
-        "query"
-      ]
-    },
-    "tier": 0,
-    "source": "playwright",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [],
-    "domain": "Research & Intelligence",
-    "labels": [
-      "research",
-      "scraping",
-      "web-search"
-    ]
-  },
-  {
     "name": "youtube_test_channel",
     "description": "Test if a YouTube channel handle is valid and has a videos tab. Returns success or the specific yt-dlp error.",
     "parameters": {
@@ -452,41 +394,6 @@
       "research",
       "scraping",
       "web-search"
-    ]
-  },
-  {
-    "name": "audit_data_quality",
-    "description": "Run a data quality audit for a specific ticker. Checks price history, technicals, fundamentals, and news completeness. Returns a quality score (0-1) and lists any data gaps or missing sources. Also identifies junk stocks (penny stocks, micro-caps, zero volume) for pruning.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ticker": {
-          "type": "string",
-          "description": "The stock ticker to audit (e.g. 'NVDA')."
-        }
-      },
-      "required": [
-        "ticker"
-      ]
-    },
-    "tier": 1,
-    "source": "internal_db",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [
-      "audit",
-      "data",
-      "quality",
-      "gaps",
-      "completeness"
-    ],
-    "domain": "System & Autonomy",
-    "labels": [
-      "system",
-      "autonomy",
-      "audit"
     ]
   },
   {
@@ -554,116 +461,6 @@
       "verify",
       "fact-check",
       "ground-truth"
-    ],
-    "domain": "System & Autonomy",
-    "labels": [
-      "system",
-      "autonomy",
-      "audit"
-    ]
-  },
-  {
-    "name": "get_strategy_performance",
-    "description": "Get historical trading performance for a specific ticker. Returns past trade outcomes, win rate, and P&L to inform whether this stock has been profitable or lossy in previous cycles.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ticker": {
-          "type": "string",
-          "description": "The stock ticker to check performance for."
-        },
-        "limit": {
-          "type": "integer",
-          "description": "Max number of past trades to return. Default 10."
-        }
-      },
-      "required": [
-        "ticker"
-      ]
-    },
-    "tier": 1,
-    "source": "internal_db",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [
-      "performance",
-      "strategy",
-      "history",
-      "pnl",
-      "win-rate"
-    ],
-    "domain": "System & Autonomy",
-    "labels": [
-      "system",
-      "autonomy",
-      "audit"
-    ]
-  },
-  {
-    "name": "get_autoresearch_report",
-    "description": "Get the latest AutoResearch report, which contains automated audit results including data quality scores, decision quality scores, LLM performance, and AI-generated recommendations for system improvement.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "cycle_id": {
-          "type": "string",
-          "description": "Optional: specific cycle_id. If omitted, returns the latest report."
-        }
-      },
-      "required": []
-    },
-    "tier": 1,
-    "source": "internal_db",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [
-      "autoresearch",
-      "report",
-      "audit",
-      "recommendations"
-    ],
-    "domain": "System & Autonomy",
-    "labels": [
-      "system",
-      "autonomy",
-      "audit"
-    ]
-  },
-  {
-    "name": "trigger_deep_research",
-    "description": "Trigger a mid-cycle deep research pass for a specific ticker. Use this when you identify critical data gaps (e.g., missing fundamentals or news) and need to wait for the data collectors to fill the gaps before making a decision.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ticker": {
-          "type": "string",
-          "description": "The stock ticker to research."
-        },
-        "cycle_id": {
-          "type": "string",
-          "description": "The current cycle ID."
-        }
-      },
-      "required": [
-        "ticker",
-        "cycle_id"
-      ]
-    },
-    "tier": 1,
-    "source": "internal_db",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [
-      "research",
-      "gaps",
-      "collect",
-      "autoresearch"
     ],
     "domain": "System & Autonomy",
     "labels": [
@@ -1192,27 +989,6 @@
     },
     "tier": 0,
     "source": "earnings",
-    "permission": "read_only",
-    "fallback_only": false,
-    "concurrency_safe": true,
-    "max_result_chars": 50000,
-    "tags": [],
-    "domain": "Market Data",
-    "labels": [
-      "market-data",
-      "stock-analysis"
-    ]
-  },
-  {
-    "name": "get_macro_data",
-    "description": "Fetch macroeconomic indicators and events.",
-    "parameters": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    },
-    "tier": 0,
-    "source": "macro",
     "permission": "read_only",
     "fallback_only": false,
     "concurrency_safe": true,

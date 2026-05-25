@@ -5,22 +5,17 @@ from app.tools.finance_tools import (
     get_technical_indicators,
 )
 from app.tools.wiki_tools import write_memory_note, read_memory_note, search_wiki
-from app.tools.quant_tools import run_quant_equation
 from app.tools.web_tools import query_hermes, hermes_web_research
+from app.tools.quant_tools import execute_momentum_strategy, execute_value_strategy
 
 from app.tools.db_tools import search_internal_database, update_youtube_channel_handle
 from app.tools.youtube_tools import (
-    youtube_search_handle,
     youtube_test_channel,
 )
 
-# Phase 2: Pipeline Skills as Tools
 from app.tools.pipeline_tools import (
-    audit_data_quality,
     audit_decision_quality,
     check_hallucination,
-    get_strategy_performance,
-    get_autoresearch_report,
 )
 
 # Phase 3: Agent Coordination Tools
@@ -87,17 +82,12 @@ __all__ = [
     "search_wiki",
     "query_hermes",
     "hermes_web_research",
-    "run_quant_equation",
     "search_internal_database",
     "update_youtube_channel_handle",
-    "youtube_search_handle",
     "youtube_test_channel",
     # Phase 2: Pipeline Tools
-    "audit_data_quality",
     "audit_decision_quality",
     "check_hallucination",
-    "get_strategy_performance",
-    "get_autoresearch_report",
     # Phase 3: Coordination Tools
     "post_finding",
     "read_team_findings",
@@ -110,6 +100,8 @@ __all__ = [
     # Phase 5: Trading Tools
     "buy_stock",
     "sell_stock",
+    "execute_momentum_strategy",
+    "execute_value_strategy",
     # Phase 6: Deterministic Financial Calculators
     "calculate_position_size",
     "calculate_stop_loss",

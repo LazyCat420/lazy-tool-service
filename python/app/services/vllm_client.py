@@ -66,6 +66,20 @@ def _is_qwen_model(model_id: str) -> bool:
     return "qwen" in lower
 
 
+def _url_to_prism_provider(url: str | None) -> str:
+    """Resolve the canonical Prism provider name ('vllm', 'vllm-2')
+    based on the endpoint URL (10.0.0.30 -> vllm, 10.0.0.141 -> vllm-2).
+    """
+    if not url:
+        return "vllm"
+    if "10.0.0.30" in url:
+        return "vllm"
+    if "10.0.0.141" in url:
+        return "vllm-2"
+    return "vllm"
+
+
+
 # ── Priority Levels ────────────────────────────────────────────────────
 class Priority(IntEnum):
     """Lower number = higher priority."""
@@ -252,20 +266,6 @@ class VLLMClient:
             )
             ep.init_concurrency(self.RESERVED_HIGH_SLOTS)
             self._endpoints["dgx_spark"] = ep
-
-        if settings.DGX_SPARK_2_VLLM_URL:
-            is_enabled = not getattr(settings, "DISREGARD_MSI_SPARK", False)
-            ep = VLLMEndpoint(
-                name="dgx_spark_2",
-                url=settings.DGX_SPARK_2_VLLM_URL,
-                role="analyst",
-                max_concurrent=settings.DGX_SPARK_2_MAX_CONCURRENT,
-                purpose="Deep analysis, RLM decisions, debate engine",
-                batch_size=settings.DGX_SPARK_2_BATCH_SIZE,
-                enabled=is_enabled,
-            )
-            ep.init_concurrency(self.RESERVED_HIGH_SLOTS)
-            self._endpoints["dgx_spark_2"] = ep
 
         # ── Prism gateway ──
         self.prism_client = PrismClient()
@@ -847,8 +847,9 @@ class VLLMClient:
                         ep.name,
                         self.prism_client.agent,
                     )
+                    prism_provider = _url_to_prism_provider(ep.url if ep else None)
                     content, total_tokens, elapsed_ms = await self._call_prism_agent(
-                        client, item.payload, meta, start
+                        client, item.payload, meta, start, provider=prism_provider
                     )
                     prism_routed = True
                 else:
@@ -1282,6 +1283,7 @@ class VLLMClient:
         payload: dict,
         meta: dict,
         start: float,
+        provider: str = "vllm",
     ) -> tuple[str, int, int]:
         """Route through Prism's /agent endpoint (agentic loop with tool calling).
 
@@ -1317,6 +1319,7 @@ class VLLMClient:
             tools=None,
             is_qwen_model=_is_qwen_model(model_id),
             agentic_mode=is_interactive,
+            provider=provider,
         )
         agent_payload, target_url, headers = prism_payload
 
@@ -1332,6 +1335,11 @@ class VLLMClient:
         )
         elapsed_ms = int((time.monotonic() - start) * 1000)
         data = r.json()
+
+        # Raise error if response represents an error payload
+        if "error" in data or data.get("error") is True:
+            error_msg = data.get("message") or data.get("error") or "Unknown Prism error"
+            raise RuntimeError(f"Prism error: {error_msg}")
 
         # Parse Prism agent response format
         content = data.get("text") or ""
@@ -2376,6 +2384,8 @@ class VLLMClient:
 
         try:
             client = await self._get_client()
+            from app.utils.text_utils import sanitize_surrogates
+            payload = sanitize_surrogates(payload)
             async with client.stream(
                 "POST",
                 target_url,
@@ -2383,7 +2393,28 @@ class VLLMClient:
                 headers=headers,
                 timeout=180.0,
             ) as response:
-                response.raise_for_status()
+                if response.status_code != 200:
+                    body = await response.aread()
+                    logger.error(
+                        "[PRISM] chat_stream request failed status=%d body=%r",
+                        response.status_code, body
+                    )
+                    response.raise_for_status()
+
+                content_type = response.headers.get("content-type", "")
+                if "text/event-stream" not in content_type:
+                    body = await response.aread()
+                    logger.error(
+                        "[PRISM] chat_stream expected text/event-stream but got content-type=%s body=%r",
+                        content_type, body
+                    )
+                    try:
+                        error_json = _json.loads(body.decode("utf-8", errors="ignore"))
+                        error_msg = error_json.get("message") or error_json.get("error") or str(error_json)
+                    except Exception:
+                        error_msg = body.decode("utf-8", errors="ignore")
+                    raise RuntimeError(f"Prism returned non-SSE response in chat_stream: {error_msg}")
+
                 buffer = ""
                 async for raw_chunk in response.aiter_text():
                     buffer += raw_chunk

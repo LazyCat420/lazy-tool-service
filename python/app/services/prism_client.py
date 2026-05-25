@@ -103,6 +103,9 @@ class PrismClient:
         headers: dict | None = None,
     ) -> httpx.Response:
         """Internal API wrapper with explicit timeout and retry logic."""
+        from app.utils.text_utils import sanitize_surrogates
+        json_payload = sanitize_surrogates(json_payload)
+
         max_retries = 3
         backoff = 1.0
 
@@ -197,7 +200,7 @@ class PrismClient:
                 },
             },
         }
-        if is_qwen_model:
+        if is_qwen_model or (model and "qwen" in model.lower()):
             payload["thinkingEnabled"] = enable_thinking
         # Only include tools for interactive chat (agentic_mode=True).
         # Pipeline calls must NOT forward tools to Prism — they are
@@ -210,7 +213,10 @@ class PrismClient:
         elif session_id:
             payload["sessionId"] = session_id
 
-        target_url = f"{self.url}/agent?stream=false"
+        if agentic_mode:
+            target_url = f"{self.url}/agent?stream=false"
+        else:
+            target_url = f"{self.url}/chat?stream=false"
         headers = {
             "Content-Type": "application/json",
             "x-project": self.project,
@@ -386,7 +392,7 @@ class PrismClient:
                 },
             },
         }
-        if is_qwen_model:
+        if is_qwen_model or (model and "qwen" in model.lower()):
             payload["thinkingEnabled"] = enable_thinking
         if tools:
             payload["tools"] = tools

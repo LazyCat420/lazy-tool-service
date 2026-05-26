@@ -15,4 +15,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 IMAGE_NAME="lazy-tool-service"
 DISPLAY_NAME="Lazy Tool Service"
 
+# Intercept exit to introduce a delay on successful build exit.
+# This prevents a filesystem race condition in deploy-all.sh
+# where the status file is checked before the pipeline completely closes.
+exit() {
+  local code="${1:-0}"
+  if [ "$code" -eq 0 ]; then
+    sleep 2
+  fi
+  builtin exit "$code"
+}
+
 source "${SCRIPT_DIR}/../deploy-kit/lib.sh"

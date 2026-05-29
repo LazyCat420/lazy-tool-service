@@ -97,7 +97,7 @@ async def query_hermes(prompt: str) -> str:
     from app.config import settings
 
     hermes_endpoints = list(settings.HERMES_ENDPOINT_MAP.values())
-    hermes_key = settings.HERMES_API_KEY or settings.API_SERVER_KEY
+    hermes_key = settings.HERMES_API_KEY or "change-me-local-dev"
 
     if not hermes_endpoints:
         return json.dumps(
@@ -262,7 +262,7 @@ async def stream_hermes_chat(
     else:
         hermes_endpoints = list(settings.HERMES_ENDPOINT_MAP.values())
 
-    hermes_key = settings.HERMES_API_KEY or settings.API_SERVER_KEY
+    hermes_key = settings.HERMES_API_KEY or "change-me-local-dev"
 
     if not hermes_endpoints:
         yield "Error: No Hermes endpoints configured."

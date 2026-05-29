@@ -31,9 +31,10 @@ async def get_healthy_hermes_endpoints(endpoints: list[str], key: str, session: 
                 "stream": False,
             }
             ping_headers = {
-                "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
             }
+            if key:
+                ping_headers["Authorization"] = f"Bearer {key}"
             ping_timeout = aiohttp.ClientTimeout(total=15.0)
             async with session.post(
                 endpoint, json=ping_payload, headers=ping_headers, timeout=ping_timeout
@@ -96,7 +97,7 @@ async def query_hermes(prompt: str) -> str:
     from app.config import settings
 
     hermes_endpoints = list(settings.HERMES_ENDPOINT_MAP.values())
-    hermes_key = settings.API_SERVER_KEY
+    hermes_key = settings.HERMES_API_KEY
 
     if not hermes_endpoints:
         return json.dumps(
@@ -118,9 +119,10 @@ async def query_hermes(prompt: str) -> str:
                 "stream": False,
             }
             headers = {
-                "Authorization": f"Bearer {hermes_key}",
                 "Content-Type": "application/json",
             }
+            if hermes_key:
+                headers["Authorization"] = f"Bearer {hermes_key}"
 
             try:
                 timeout = aiohttp.ClientTimeout(total=60)
@@ -260,7 +262,7 @@ async def stream_hermes_chat(
     else:
         hermes_endpoints = list(settings.HERMES_ENDPOINT_MAP.values())
 
-    hermes_key = settings.API_SERVER_KEY
+    hermes_key = settings.HERMES_API_KEY
 
     if not hermes_endpoints:
         yield "Error: No Hermes endpoints configured."
@@ -290,9 +292,10 @@ async def stream_hermes_chat(
     )
 
     headers = {
-        "Authorization": f"Bearer {hermes_key}",
         "Content-Type": "application/json",
     }
+    if hermes_key:
+        headers["Authorization"] = f"Bearer {hermes_key}"
     session = get_hermes_session()
     # Filter for healthy endpoints if not overridden by user
     if not endpoint_override:

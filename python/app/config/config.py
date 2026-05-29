@@ -243,6 +243,10 @@ class Settings(BaseSettings):
 
     API_SERVER_KEY: str = "change-me-local-dev"
 
+    # Dedicated Hermes API key — independent from API_SERVER_KEY.
+    # When empty, Hermes requests skip the Authorization header entirely.
+    HERMES_API_KEY: str = _config.get("HERMES_API_KEY", "")
+
     @field_validator("API_SERVER_KEY")
     def warn_default_key(cls, v):
         if v == "change-me-local-dev":

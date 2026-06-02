@@ -16,6 +16,7 @@ FROM node:26-slim AS node-build
 
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY .npmrc ./
 RUN npm ci
 
 COPY . .

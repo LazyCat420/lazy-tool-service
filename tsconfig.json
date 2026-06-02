@@ -14,7 +14,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "rewriteRelativeImportExtensions": true,
     "lib": ["ES2022"]
   },
   "include": ["src/**/*.ts"],

@@ -10,6 +10,9 @@ interface LazyToolServiceConfig {
   PYTHON_EXEC_SCRIPT: string;
   PYTHON_CWD: string;
   PYTHONPATH: string;
+  LAZY_TOOL_SERVICE_API_KEY: string | undefined;
+  EXECUTION_TIMEOUT_MS: number;
+  CACHE_TTL_MS: number;
 }
 
 // Detect if we are inside the Docker container
@@ -42,6 +45,9 @@ const CONFIG: LazyToolServiceConfig = {
   PYTHON_EXEC_SCRIPT: process.env.PYTHON_EXEC_SCRIPT || defaultExecScript,
   PYTHON_CWD: process.env.PYTHON_CWD || defaultCwd,
   PYTHONPATH: process.env.PYTHONPATH || defaultPythonPath,
+  LAZY_TOOL_SERVICE_API_KEY: process.env.LAZY_TOOL_SERVICE_API_KEY,
+  EXECUTION_TIMEOUT_MS: Number(process.env.EXECUTION_TIMEOUT_MS || "30000"),
+  CACHE_TTL_MS: Number(process.env.CACHE_TTL_MS || "60000"),
 };
 
 export default CONFIG;

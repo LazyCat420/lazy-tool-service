@@ -17,20 +17,21 @@
     "deploy:dry": "bash deploy.sh --dry-run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "1.29.0",
     "@rodrigo-barraza/utilities-library": "github:rodrigo-barraza/utilities-library",
-    "express": "^5.2.1",
-    "typescript": "next"
+    "express": "5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "typescript": "5.4.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.9.0",
-    "eslint": "^10.4.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.6.0",
-    "prettier": "^3.8.3",
-    "tsx": "^4.22.0",
-    "typescript-eslint": "^8.33.0"
+    "@eslint/js": "9.39.4",
+    "@types/express": "5.0.6",
+    "@types/node": "25.9.0",
+    "eslint": "10.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.6.0",
+    "prettier": "3.8.3",
+    "tsx": "4.22.0",
+    "typescript-eslint": "8.33.0"
   }
 }

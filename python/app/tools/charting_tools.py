@@ -109,7 +109,7 @@ async def ask_llm(session, df, symbol, iteration=1, prev_specs=None, period="3mo
         "temperature": 0.3 if iteration > 1 else 0.1
     }
 
-    async with session.post(VLLM_ENDPOINT, json=payload, timeout=300) as resp:
+    async with session.post(VLLM_ENDPOINT, json=payload, timeout=900) as resp:
         if resp.status != 200:
             text = await resp.text()
             raise Exception(f"LLM API Error {resp.status}: {text}")
@@ -223,7 +223,10 @@ async def generate_trading_chart(ticker: str, iterations: int = 1, period: str =
                 }
                 prev_specs.append(entry)
             except Exception as e:
-                return f"Failed to generate chart on iteration {i}: {str(e)}"
+                import traceback
+                error_msg = f"{repr(e)}: {traceback.format_exc()}"
+                print(f"Chart generation error: {error_msg}")
+                return f"Failed to generate chart on iteration {i}: {repr(e)}"
 
     latest = prev_specs[-1]
     chart_url = f"http://10.0.0.16:5591/charts/{latest['filename']}"

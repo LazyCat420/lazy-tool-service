@@ -3,24 +3,22 @@
 # ============================================================
 
 # ── Stage 1: Python venv Builder ─────────────────────────────
-FROM node:26-slim AS python-deps
+FROM python:3.11-slim AS python-deps
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-venv \
     gcc \
     g++ \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m venv /opt/venv
+RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY python/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # ── Stage 2: Node.js TS Builder ──────────────────────────────
-FROM node:26-slim AS node-build
+FROM node:20-slim AS node-build
 
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -32,18 +30,16 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ── Stage 3: Runtime ──────────────────────────────────────────
-FROM node:26-slim
+FROM python:3.11-slim
 
-# Install Python 3.11 and wget
+# Install Node.js 20.x, wget, and ca-certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-venv \
     wget \
+    curl \
     ca-certificates \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
-
-# Fix python symlink for virtualenv compatibility
-RUN ln -sf /usr/bin/python3 /usr/local/bin/python
 
 WORKDIR /app
 

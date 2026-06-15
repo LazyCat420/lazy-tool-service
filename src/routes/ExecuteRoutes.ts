@@ -140,7 +140,21 @@ const handleExecuteRoute: RequestHandler = async (req, res) => {
 
   try {
     logger.info(JSON.stringify({ event: "tool_start", toolName, args }));
-    const result = await executeTool(toolName as string, args);
+    
+    let result;
+    const tName = toolName as string;
+    if (tName.startsWith("music_player_")) {
+      if (tName === "music_player_suggest_artists") {
+        result = { artists: args.artists || [] };
+      } else if (tName === "music_player_add_node") {
+        result = { artist_name: args.name || args.artist_name || "", type: args.type || "artist" };
+      } else {
+        result = { success: true };
+      }
+    } else {
+      result = await executeTool(tName, args);
+    }
+    
     const durationMs = Date.now() - startTime;
     logger.info(JSON.stringify({ event: "tool_success", toolName, durationMs }));
     

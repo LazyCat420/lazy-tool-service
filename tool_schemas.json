@@ -1,5 +1,71 @@
 [
   {
+    "name": "music_player_suggest_artists",
+    "description": "Suggest a list of similar artists or genre recommendations to the user. Displays clickable recommendation chips in the chat UI.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "artists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of recommended artist names"
+        }
+      },
+      "required": [
+        "artists"
+      ]
+    },
+    "tier": 0,
+    "source": "",
+    "permission": "read_only",
+    "fallback_only": false,
+    "concurrency_safe": true,
+    "max_result_chars": 50000,
+    "tags": [],
+    "domain": "General",
+    "labels": [
+      "tool"
+    ]
+  },
+  {
+    "name": "music_player_add_node",
+    "description": "Add a new artist or genre node to the user's interactive music graph.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the artist or genre to add"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "artist",
+            "genre"
+          ],
+          "description": "The type of node (either 'artist' or 'genre')"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "tier": 0,
+    "source": "",
+    "permission": "write",
+    "fallback_only": false,
+    "concurrency_safe": true,
+    "max_result_chars": 50000,
+    "tags": [],
+    "domain": "General",
+    "labels": [
+      "tool"
+    ]
+  },
+  {
     "name": "get_market_data",
     "description": "Get recent price history, fundamentals, financials, and balance sheet for a stock from multiple reliable sources.",
     "parameters": {
@@ -1198,7 +1264,7 @@
   },
   {
     "name": "create_or_update_schedule",
-    "description": "Create a new automated trading cycle schedule or update an existing one. Use this after completing a trading cycle to ensure the bot runs again. Parameters: name (str), interval_hours (float, 1-168), collect (bool), analyze (bool), market_hours_only (bool). Safety: max 6 active schedules, min 1h interval.",
+    "description": "Create a new automated trading cycle schedule or update an existing one. Use this after completing a trading cycle to ensure the bot runs again. Parameters: name (str), interval_hours (float, 1-168), collect (bool), analyze (bool), market_hours_only (bool), tickers (string[]), max_tickers (number), discovered_tickers (number). Safety: max 6 active schedules, min 1h interval.",
     "parameters": {
       "type": "object",
       "properties": {
@@ -1229,6 +1295,21 @@
         "update_schedule_id": {
           "type": "string",
           "description": "If provided, update this existing schedule instead of creating a new one."
+        },
+        "tickers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional explicit tickers this schedule should always include."
+        },
+        "max_tickers": {
+          "type": "number",
+          "description": "Hard cap on total tickers processed for this schedule."
+        },
+        "discovered_tickers": {
+          "type": "number",
+          "description": "Max number of discovery tickers to add per run for this schedule."
         }
       },
       "required": [

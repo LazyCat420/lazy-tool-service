@@ -1,4 +1,8 @@
 from app.tools.registry import registry, PermissionLevel
+from app.tools.music_player.music_tools import (
+    music_player_suggest_artists,
+    music_player_add_node,
+)
 from app.tools.finance_tools import (
     get_market_data,
     get_finnhub_news,
@@ -129,4 +133,7 @@ __all__ = [
     "get_cycle_context_all",
     # Phase 11: Charting Tools
     "save_trading_chart",
+    # Music Player Tools
+    "music_player_suggest_artists",
+    "music_player_add_node",
 ]

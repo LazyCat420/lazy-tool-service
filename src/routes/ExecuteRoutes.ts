@@ -10,7 +10,7 @@ const router = Router();
 
 // Cache structure
 interface CacheEntry {
-  result: any;
+  result: unknown;
   expiresAt: number;
 }
 const cache = new Map<string, CacheEntry>();
@@ -21,14 +21,14 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-export const executeTool = async (toolName: string, args: Record<string, any>): Promise<any> => {
-  const argsJson = JSON.stringify(args);
-  const cacheKey = crypto.createHash("sha256").update(toolName + argsJson).digest("hex");
+export const executeTool = async (toolName: string, toolArguments: Record<string, unknown>): Promise<unknown> => {
+  const argumentsJson = JSON.stringify(toolArguments);
+  const cacheKey = crypto.createHash("sha256").update(toolName + argumentsJson).digest("hex");
 
   // Check cache
   const cached = cache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
-    logger.info(JSON.stringify({ event: "cache_hit", toolName, args }));
+    logger.info(JSON.stringify({ event: "cache_hit", toolName, args: toolArguments }));
     return cached.result;
   }
 
@@ -43,7 +43,7 @@ export const executeTool = async (toolName: string, args: Record<string, any>): 
 
     const child = spawn(
       CONFIG.PYTHON_INTERPRETER,
-      [CONFIG.PYTHON_EXEC_SCRIPT, toolName, argsJson],
+      [CONFIG.PYTHON_EXEC_SCRIPT, toolName, argumentsJson],
       {
         cwd: CONFIG.PYTHON_CWD,
         env
@@ -82,7 +82,7 @@ export const executeTool = async (toolName: string, args: Record<string, any>): 
         // Save to cache
         cache.set(cacheKey, { result: parsed, expiresAt: Date.now() + CONFIG.CACHE_TTL_MS });
         resolve(parsed);
-      } catch (err: any) {
+      } catch (error: unknown) {
         reject(new Error(`Invalid JSON output from tool: ${stdout}`));
       }
     });
@@ -124,65 +124,65 @@ async function reportUsage(payload: {
     if (!response.ok) {
       logger.warn(`[UsageReporting] Failed to report tool usage, status=${response.status}`);
     }
-  } catch (err: any) {
-    logger.error(`[UsageReporting] Network error reporting tool usage: ${err.message}`);
+  } catch (error: unknown) {
+    logger.error(`[UsageReporting] Network error reporting tool usage: ${(error as Error).message}`);
   }
 }
 
-const handleExecuteRoute: RequestHandler = async (req, res) => {
-  const { toolName } = req.params;
-  const args = req.body || {};
+const handleExecuteRoute: RequestHandler = async (request, response) => {
+  const { toolName } = request.params;
+  const toolArguments = (request.body || {}) as Record<string, unknown>;
   const startTime = Date.now();
 
-  const agentName = (req.headers["x-agent"] || req.headers["x-username"] || "") as string;
-  const cycleId = (req.headers["x-conversation-id"] || req.headers["x-request-id"] || "") as string;
-  const ticker = (req.headers["x-ticker"] || args.ticker || args.Ticker || "") as string;
+  const agentName = (request.headers["x-agent"] || request.headers["x-username"] || "") as string;
+  const cycleId = (request.headers["x-conversation-id"] || request.headers["x-request-id"] || "") as string;
+  const ticker = (request.headers["x-ticker"] || toolArguments.ticker || toolArguments.Ticker || "") as string;
 
   try {
-    logger.info(JSON.stringify({ event: "tool_start", toolName, args }));
+    logger.info(JSON.stringify({ event: "tool_start", toolName, args: toolArguments }));
     
-    let result;
+    let result: unknown;
     const tName = toolName as string;
     if (tName.startsWith("music_player_")) {
       const musicApiUrl = "http://10.0.0.16:8002";
-      let res: any = null;
+      let musicApiResponse: globalThis.Response | null = null;
       if (tName === "music_player_suggest_artists") {
-        result = { artists: args.artists || [] };
+        result = { artists: toolArguments.artists || [] };
       } else if (tName === "music_player_add_node") {
-        res = await fetch(`${musicApiUrl}/api/artists/add-node`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({name: args.name, type: args.type}) });
+        musicApiResponse = await fetch(`${musicApiUrl}/api/artists/add-node`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({name: toolArguments.name, type: toolArguments.type}) });
       } else if (tName === "music_player_remove_node") {
-        res = await fetch(`${musicApiUrl}/api/graph/discovered/${encodeURIComponent(args.node_id)}`, { method: "DELETE" });
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/discovered/${encodeURIComponent(toolArguments.node_id as string)}`, { method: "DELETE" });
       } else if (tName === "music_player_add_edge") {
-        res = await fetch(`${musicApiUrl}/api/graph/edge`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({source: args.source, target: args.target, relationship: args.relationship || "related"}) });
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/edge`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({source: toolArguments.source, target: toolArguments.target, relationship: toolArguments.relationship || "related"}) });
       } else if (tName === "music_player_remove_edge") {
-        res = await fetch(`${musicApiUrl}/api/graph/edge?source=${encodeURIComponent(args.source)}&target=${encodeURIComponent(args.target)}`, { method: "DELETE" });
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/edge?source=${encodeURIComponent(toolArguments.source as string)}&target=${encodeURIComponent(toolArguments.target as string)}`, { method: "DELETE" });
       } else if (tName === "music_player_override_node_type") {
-        res = await fetch(`${musicApiUrl}/api/graph/override-type`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({node_id: args.node_id, group_type: args.group_type}) });
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/override-type`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({node_id: toolArguments.node_id, group_type: toolArguments.group_type}) });
       } else if (tName === "music_player_expand_artist") {
-        res = await fetch(`${musicApiUrl}/api/graph/expand/${encodeURIComponent(args.artist)}?count=${args.count || 8}`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/expand/${encodeURIComponent(toolArguments.artist as string)}?count=${toolArguments.count || 8}`);
       } else if (tName === "music_player_expand_genre") {
-        res = await fetch(`${musicApiUrl}/api/graph/expand/genre/${encodeURIComponent(args.genre)}?count=${args.count || 8}`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/expand/genre/${encodeURIComponent(toolArguments.genre as string)}?count=${toolArguments.count || 8}`);
       } else if (tName === "music_player_get_graph_state") {
-        res = await fetch(`${musicApiUrl}/api/graph/discovered`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/graph/discovered`);
       } else if (tName === "music_player_search_artists") {
-        res = await fetch(`${musicApiUrl}/api/artists`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/artists`);
       } else if (tName === "music_player_get_artist_info") {
-        res = await fetch(`${musicApiUrl}/api/artist/info/${encodeURIComponent(args.name)}`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/artist/info/${encodeURIComponent(toolArguments.name as string)}`);
       } else if (tName === "music_player_list_genres") {
-        res = await fetch(`${musicApiUrl}/api/genres`);
+        musicApiResponse = await fetch(`${musicApiUrl}/api/genres`);
       } else {
         result = { success: true };
       }
 
-      if (res !== null) {
-        if (res.ok) {
-          result = await res.json();
+      if (musicApiResponse !== null) {
+        if (musicApiResponse.ok) {
+          result = await musicApiResponse.json();
         } else {
-          result = { error: await res.text() };
+          result = { error: await musicApiResponse.text() };
         }
       }
     } else {
-      result = await executeTool(tName, args);
+      result = await executeTool(tName, toolArguments);
     }
     
     const durationMs = Date.now() - startTime;
@@ -199,8 +199,8 @@ const handleExecuteRoute: RequestHandler = async (req, res) => {
       service_source: "lazy-tool-service"
     }).catch(() => {});
 
-    res.json(result);
-  } catch (error: any) {
+    response.json(result);
+  } catch (error: unknown) {
     const errorMsg = (error as Error).message;
     const durationMs = Date.now() - startTime;
     logger.error(JSON.stringify({ event: "tool_failure", toolName, error: errorMsg, durationMs }));
@@ -219,13 +219,13 @@ const handleExecuteRoute: RequestHandler = async (req, res) => {
 
     // Append to DLQ
     try {
-      const dlqEntry = JSON.stringify({ timestamp: new Date().toISOString(), toolName, args, error: errorMsg, durationMs }) + "\n";
-      fs.promises.appendFile(path.join(dataDir, "dlq.jsonl"), dlqEntry).catch(() => {});
+      const deadLetterQueueEntry = JSON.stringify({ timestamp: new Date().toISOString(), toolName, args: toolArguments, error: errorMsg, durationMs }) + "\n";
+      fs.promises.appendFile(path.join(dataDir, "dlq.jsonl"), deadLetterQueueEntry).catch(() => {});
     } catch (fsErr) {
       // Ignore DLQ append errors silently to not crash the request
     }
     
-    res.status(500).json({ error: errorMsg, code: 500 });
+    response.status(500).json({ error: errorMsg, code: 500 });
   }
 };
 

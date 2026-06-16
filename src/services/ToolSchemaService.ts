@@ -85,25 +85,25 @@ try {
   if (fs.existsSync(schemasPath)) {
     const rawData = fs.readFileSync(schemasPath, "utf-8");
     const list = JSON.parse(rawData);
-    schemas = list.map((item: any) => {
-      const tool = item.function || item;
+    schemas = list.map((item: unknown) => {
+      const itemRecord = item as Record<string, unknown>;
+      const tool = (itemRecord.function || itemRecord) as Record<string, unknown>;
       return {
         ...tool,
-        domain: item.domain || tool.domain || "General",
-        labels: item.labels || tool.labels || ["tool"],
-        emoji: item.emoji || tool.emoji || null,
-        // Map every tool to a post execution endpoint in lazy-tool-service
-        endpoint: item.endpoint || tool.endpoint || {
+        domain: (itemRecord.domain || tool.domain || "General") as string,
+        labels: (itemRecord.labels || tool.labels || ["tool"]) as string[],
+        emoji: (itemRecord.emoji || tool.emoji || null) as string | null,
+        endpoint: (itemRecord.endpoint || tool.endpoint || {
           path: `/execute/${tool.name}`,
           method: "POST"
-        }
-      };
+        }) as ToolEndpoint
+      } as unknown as ToolSchema;
     });
     logger.success(`Loaded ${schemas.length} tool schemas from tool_schemas.json`);
   } else {
     logger.warn(`tool_schemas.json not found at ${schemasPath}. Run export_tool_schemas.py first.`);
   }
-} catch (error: any) {
+} catch (error: unknown) {
   logger.error(`Error loading tool schemas: ${(error as Error).message}`);
 }
 

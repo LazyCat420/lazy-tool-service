@@ -13,6 +13,7 @@ import {
 import {
   getToolSchemas,
   type ToolSchema,
+  type ToolEndpoint,
 } from "./ToolSchemaService.js";
 import CONFIG from "../config.js";
 import logger from "../logger.js";
@@ -20,13 +21,13 @@ import type { Request, Response, Application } from "express";
 
 const SELF_BASE_URL = CONFIG.LAZY_TOOL_SERVICE_URL;
 
-async function executeTool(toolName: string, endpoint: Record<string, any>, args: Record<string, any> = {}): Promise<any> {
+async function executeTool(toolName: string, endpoint: ToolEndpoint, toolArguments: Record<string, unknown> = {}): Promise<unknown> {
   try {
     const url = `${SELF_BASE_URL}${endpoint.path}`;
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(args),
+      body: JSON.stringify(toolArguments),
     });
     if (!response.ok) {
       return { error: `API returned ${response.status}: ${response.statusText}` };
@@ -44,7 +45,7 @@ function createMcpServer() {
   );
 
   const fullSchemas = getToolSchemas();
-  const toolMap = new Map();
+  const toolMap = new Map<string, ToolSchema>();
   for (const schema of fullSchemas) {
     toolMap.set(schema.name, schema);
   }
@@ -52,15 +53,15 @@ function createMcpServer() {
   server.setRequestHandler(
     ListToolsRequestSchema,
     async () => {
-      const fullSchemas = getToolSchemas();
+      const currentSchemas = getToolSchemas();
       return {
-        tools: fullSchemas.map((t: ToolSchema) => ({
-          name: t.name,
-          description: t.description || "",
-          inputSchema: t.parameters || { type: "object", properties: {} },
+        tools: currentSchemas.map((toolSchema: ToolSchema) => ({
+          name: toolSchema.name,
+          description: toolSchema.description || "",
+          inputSchema: toolSchema.parameters || { type: "object", properties: {} },
           _meta: {
-            domain: t.domain,
-            labels: t.labels,
+            domain: toolSchema.domain,
+            labels: toolSchema.labels,
           },
         })),
       };
@@ -70,7 +71,7 @@ function createMcpServer() {
   server.setRequestHandler(
     CallToolRequestSchema,
     async (request: { params: { name: string; arguments?: Record<string, unknown> } }) => {
-      const { name, arguments: args = {} } = request.params;
+      const { name, arguments: toolArguments = {} } = request.params;
       const schema = toolMap.get(name);
 
       if (!schema || !schema.endpoint) {
@@ -81,12 +82,12 @@ function createMcpServer() {
       }
 
       try {
-        const result = await executeTool(name, schema.endpoint, args);
+        const result = await executeTool(name, schema.endpoint, toolArguments);
         // Note: result here is the object from execute_tool.py which has a "content" field
-        const text = result?.content || JSON.stringify(result);
+        const text = (result as { content?: string })?.content || JSON.stringify(result);
         return {
           content: [{ type: "text", text }],
-          isError: !!result?.error,
+          isError: !!(result as { error?: unknown })?.error,
         };
       } catch (error: unknown) {
         return {
@@ -100,17 +101,17 @@ function createMcpServer() {
   return server;
 }
 
-export function mountMcpRoutes(app: Application) {
+export function mountMcpRoutes(application: Application) {
   const sessions = new Map<string, { server: Server; transport: SSEServerTransport }>();
 
   // 1. Standard SSE transport routes
-  app.get("/mcp/sse", async (req: Request, res: Response) => {
-    const transport = new SSEServerTransport("/mcp/messages", res);
+  application.get("/mcp/sse", async (request: Request, response: Response) => {
+    const transport = new SSEServerTransport("/mcp/messages", response);
     const server = createMcpServer();
 
     sessions.set(transport.sessionId, { server, transport });
 
-    res.on("close", () => {
+    response.on("close", () => {
       sessions.delete(transport.sessionId);
       server.close().catch(() => {});
     });
@@ -118,16 +119,16 @@ export function mountMcpRoutes(app: Application) {
     await server.connect(transport);
   });
 
-  app.post("/mcp/messages", async (req: Request, res: Response) => {
-    const sessionId = req.query.sessionId as string;
+  application.post("/mcp/messages", async (request: Request, response: Response) => {
+    const sessionId = request.query.sessionId as string;
     const session = sessions.get(sessionId);
 
     if (!session) {
-      res.status(400).json({ error: "Invalid or expired session" });
+      response.status(400).json({ error: "Invalid or expired session" });
       return;
     }
 
-    await session.transport.handlePostMessage(req, res, req.body);
+    await session.transport.handlePostMessage(request, response, request.body);
   });
 
   logger.info("   🔌 MCP SSE adapter mounted at /mcp/sse");
@@ -135,9 +136,9 @@ export function mountMcpRoutes(app: Application) {
   // 2. Streamable HTTP transport routes (used by Prism)
   const streamableSessions = new Map<string, { server: Server; transport: StreamableHTTPServerTransport }>();
 
-  app.all("/mcp", async (req: Request, res: Response) => {
+  application.all("/mcp", async (request: Request, response: Response) => {
     try {
-      const sessionId = req.headers["mcp-session-id"] as string;
+      const sessionId = request.headers["mcp-session-id"] as string;
       let session = sessionId ? streamableSessions.get(sessionId) : null;
 
       if (!session) {
@@ -147,8 +148,8 @@ export function mountMcpRoutes(app: Application) {
             generatedSessionId = randomUUID();
             return generatedSessionId;
           },
-          onsessionclosed: (id) => {
-            streamableSessions.delete(id);
+          onsessionclosed: (sessionIdentifier) => {
+            streamableSessions.delete(sessionIdentifier);
             server.close().catch(() => {});
           }
         });
@@ -166,19 +167,19 @@ export function mountMcpRoutes(app: Application) {
         session = { server, transport };
 
         // Handle the initial request
-        await transport.handleRequest(req, res, req.body);
+        await transport.handleRequest(request, response, request.body);
 
         // Store the session if one was generated
         if (generatedSessionId) {
           streamableSessions.set(generatedSessionId, session);
         }
       } else {
-        await session.transport.handleRequest(req, res, req.body);
+        await session.transport.handleRequest(request, response, request.body);
       }
-    } catch (err: any) {
-      logger.error(`[MCP-Streamable] Error handling request: ${err.message}`);
-      if (!res.headersSent) {
-        res.status(500).json({ error: err.message || "Internal server error" });
+    } catch (error: unknown) {
+      logger.error(`[MCP-Streamable] Error handling request: ${(error as Error).message}`);
+      if (!response.headersSent) {
+        response.status(500).json({ error: (error as Error).message || "Internal server error" });
       }
     }
   });

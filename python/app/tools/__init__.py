@@ -3,6 +3,13 @@ from app.tools.music_player.music_tools import (
     music_player_suggest_artists,
     music_player_add_node,
 )
+from app.tools.html_notes.note_tools import (
+    html_notes_create_note,
+    html_notes_update_note,
+    html_notes_get_note,
+    html_notes_search_notes,
+    html_notes_link_notes,
+)
 from app.tools.finance_tools import (
     get_market_data,
     get_finnhub_news,
@@ -136,4 +143,10 @@ __all__ = [
     # Music Player Tools
     "music_player_suggest_artists",
     "music_player_add_node",
+    # HTML Notes Tools
+    "html_notes_create_note",
+    "html_notes_update_note",
+    "html_notes_get_note",
+    "html_notes_search_notes",
+    "html_notes_link_notes",
 ]

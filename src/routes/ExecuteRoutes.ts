@@ -181,6 +181,18 @@ const handleExecuteRoute: RequestHandler = async (request, response) => {
           result = { error: await musicApiResponse.text() };
         }
       }
+    } else if (tName.startsWith("html_notes_") || tName === "render_component") {
+      const htmlNotesUrl = process.env.HTML_NOTES_URL || "http://10.0.0.16:8035";
+      const apiResponse = await fetch(`${htmlNotesUrl}/internal/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: tName, args: toolArguments })
+      });
+      if (apiResponse.ok) {
+        result = await apiResponse.json();
+      } else {
+        result = { error: await apiResponse.text(), is_error: true };
+      }
     } else {
       result = await executeTool(tName, toolArguments);
     }

@@ -425,6 +425,38 @@
     }
   },
   {
+    "name": "canvas_add_widget",
+    "description": "Add a pre-built smart widget (Lego block) to the dashboard. The frontend already has the logic, you just configure the starting state.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "widget_type": {
+          "type": "string",
+          "enum": ["checklist", "kanban", "clock", "calendar", "notes"],
+          "description": "The type of widget to spawn."
+        },
+        "widget_id": {
+          "type": "string",
+          "description": "A unique CSS ID for this widget (e.g., 'widget-checklist-1')."
+        },
+        "config": {
+          "type": "object",
+          "description": "Configuration object for the widget (e.g., {\"title\": \"My Tasks\", \"items\": [\"Task 1\"]})"
+        }
+      },
+      "required": ["widget_type", "widget_id"]
+    },
+    "tier": 0,
+    "permission": "write",
+    "concurrency_safe": true,
+    "domain": "General",
+    "labels": ["tool"],
+    "endpoint": {
+      "path": "/execute/canvas_add_widget",
+      "method": "POST"
+    }
+  },
+  {
     "name": "get_market_data",
     "description": "Get recent price history, fundamentals, financials, and balance sheet for a stock from multiple reliable sources.",
     "parameters": {

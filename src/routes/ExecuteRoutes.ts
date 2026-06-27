@@ -33,13 +33,17 @@ export const executeTool = async (toolName: string, toolArguments: Record<string
   }
 
   return new Promise((resolve, reject) => {
-    // Set up environment
-    const env = {
-      ...process.env,
-      PYTHONPATH: CONFIG.PYTHONPATH,
-      SKIP_TOOL_USAGE_LOG: "true",
-      USE_LAZY_TOOL_SERVICE: "false"
-    };
+    // Set up environment, stripping empty strings to avoid Pydantic conversion errors
+    const env: Record<string, string> = {};
+    for (const key of Object.keys(process.env)) {
+      const val = process.env[key];
+      if (val !== undefined && val !== "") {
+        env[key] = val;
+      }
+    }
+    env.PYTHONPATH = CONFIG.PYTHONPATH;
+    env.SKIP_TOOL_USAGE_LOG = "true";
+    env.USE_LAZY_TOOL_SERVICE = "false";
 
     const child = spawn(
       CONFIG.PYTHON_INTERPRETER,
@@ -131,7 +135,10 @@ async function reportUsage(payload: {
 
 const handleExecuteRoute: RequestHandler = async (request, response) => {
   const { toolName } = request.params;
-  const toolArguments = (request.body || {}) as Record<string, unknown>;
+  let toolArguments = (request.body || {}) as Record<string, unknown>;
+  if (toolArguments.arguments && typeof toolArguments.arguments === "object") {
+    toolArguments = toolArguments.arguments as Record<string, unknown>;
+  }
   const startTime = Date.now();
 
   const agentName = (request.headers["x-agent"] || request.headers["x-username"] || "") as string;

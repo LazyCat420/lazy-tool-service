@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       - TZ=America/Los_Angeles
+      - API_SERVER_KEY=sun-trading-secure-api-key-2026
     volumes:
       - /usr/share/zoneinfo/America/Los_Angeles:/etc/localtime:ro
       - ./data/charts:/app/data/charts

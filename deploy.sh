@@ -29,6 +29,19 @@ exit() {
 PRE_BUILD() {
   step "Running tool schema updater (add_schemas.cjs)"
   node "${SCRIPT_DIR}/add_schemas.cjs"
+
+  step "Cleaning and staging Python files for Docker build..."
+  rm -rf "${SCRIPT_DIR}/python"
+  mkdir -p "${SCRIPT_DIR}/python/app"
+
+  # Copy entire python app structure from trading-service
+  cp -r "${SCRIPT_DIR}/../trading-service/app/"* "${SCRIPT_DIR}/python/app/"
+  
+  cp -r "${SCRIPT_DIR}/../trading-service/scripts" "${SCRIPT_DIR}/python/"
+  cp "${SCRIPT_DIR}/../trading-service/requirements.txt" "${SCRIPT_DIR}/python/requirements.txt"
+
+  # Copy lazycat SDK dependencies
+  cp -r "${SCRIPT_DIR}/../lazycat-sdk/lazycat" "${SCRIPT_DIR}/python/"
 }
 
 source "${SCRIPT_DIR}/../deploy-kit/lib.sh"

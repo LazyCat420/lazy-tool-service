@@ -2,7 +2,7 @@ import http from "node:http";
 import express, { type Request, type Response, type NextFunction } from "express";
 import logger from "./logger.js";
 import CONFIG from "./config.js";
-import executeRoutes from "./routes/ExecuteRoutes.js";
+import executeRoutes, { executeTool } from "./routes/ExecuteRoutes.js";
 import AgentRoutes from "./routes/AgentRoutes.js";
 import { mountMcpRoutes } from "./services/McpAdapter.js";
 import rateLimit from "express-rate-limit";
@@ -96,6 +96,40 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error(`[GlobalErrorHandler] ${err.message}`);
   if (!res.headersSent) {
     res.status(500).json({ error: err.message || "Internal server error", code: 500 });
+  }
+});
+
+// Compatibility endpoints for apps expecting Prism API contract
+app.get("/config", apiLimiter, requireApiKey, (_req: Request, res: Response) => {
+  res.json({
+    textToText: {
+      models: {
+        google: [
+          { name: "gemini-2.0-flash-exp", label: "Gemini 2.0 Flash Exp" },
+          { name: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+          { name: "gemini-1.5-flash", label: "Gemini 1.5 Flash" }
+        ],
+        openai: [
+          { name: "gpt-4o", label: "GPT-4o" },
+          { name: "gpt-4o-mini", label: "GPT-4o Mini" }
+        ],
+        anthropic: [
+          { name: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet" }
+        ]
+      }
+    }
+  });
+});
+
+app.post("/audio-to-text", apiLimiter, requireApiKey, async (req: Request, res: Response) => {
+  const { audio, audioUrl } = req.body;
+  try {
+    const result = (await executeTool("transcribe_audio", { audio, audioUrl })) as any;
+    const text = result?.text || result?.transcription || "";
+    res.json({ text });
+  } catch (error: any) {
+    logger.error(`Audio transcription compatibility endpoint failed: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 });
 

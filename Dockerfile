@@ -21,10 +21,16 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 # ── Stage 2: Node.js TS Builder ──────────────────────────────
 FROM node:20-slim AS node-build
 
+# git and openssh-client are required by npm to fetch private git packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .npmrc ./
-RUN npm ci
+RUN --mount=type=ssh npm ci
 
 COPY . .
 RUN npm run build

@@ -30,3 +30,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .deepeval/
+
+# Local Secrets File
+projects.json

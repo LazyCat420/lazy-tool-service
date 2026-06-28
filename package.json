@@ -17,21 +17,35 @@
     "deploy:dry": "bash deploy.sh --dry-run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.103.0",
+    "@google/genai": "^2.4.0",
     "@modelcontextprotocol/sdk": "1.29.0",
+    "@rodrigo-barraza/service-library": "github:rodrigo-barraza/service-library",
     "@rodrigo-barraza/utilities-library": "github:rodrigo-barraza/utilities-library",
+    "cors": "^2.8.6",
     "express": "5.2.1",
     "express-rate-limit": "^8.5.2",
-    "typescript": "5.4.5"
+    "minio": "^8.0.7",
+    "mongodb": "^7.2.0",
+    "openai": "^6.37.0",
+    "sharp": "^0.34.5",
+    "undici": "^8.4.1",
+    "ws": "^8.20.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",
+    "@types/cors": "^2.8.19",
     "@types/express": "5.0.6",
     "@types/node": "25.9.0",
+    "@types/ws": "^8.18.1",
     "eslint": "10.4.0",
     "eslint-config-prettier": "10.1.8",
     "globals": "17.6.0",
     "prettier": "3.8.3",
+    "ts-morph": "^28.0.0",
     "tsx": "4.22.0",
+    "typescript": "^6.0.0-dev.20260416",
     "typescript-eslint": "8.33.0"
   }
 }

@@ -15,7 +15,7 @@ import {
   type ToolSchema,
   type ToolEndpoint,
 } from "./ToolSchemaService.js";
-import CONFIG from "../config.js";
+import CONFIG from "../../config.js";
 import logger from "../logger.js";
 import type { Request, Response, Application } from "express";
 

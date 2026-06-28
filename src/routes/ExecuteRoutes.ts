@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
-import CONFIG from "../config.js";
+import CONFIG from "../../config.js";
 import logger from "../logger.js";
 
 const router = Router();

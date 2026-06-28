@@ -1,7 +1,7 @@
 import http from "node:http";
 import express, { type Request, type Response, type NextFunction } from "express";
 import logger from "./logger.js";
-import CONFIG from "./config.js";
+import CONFIG from "../config.js";
 import executeRoutes, { executeTool } from "./routes/ExecuteRoutes.js";
 import AgentRoutes from "./routes/AgentRoutes.js";
 import { mountMcpRoutes } from "./services/McpAdapter.js";

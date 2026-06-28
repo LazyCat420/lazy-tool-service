@@ -19,7 +19,7 @@ COPY python/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # ── Stage 2: Node.js TS Builder ──────────────────────────────
-FROM node:20-slim AS node-build
+FROM node:22-slim AS node-build
 
 RUN npm install -g pnpm
 
@@ -35,12 +35,12 @@ RUN pnpm prune --prod
 # ── Stage 3: Runtime ──────────────────────────────────────────
 FROM python:3.11-slim
 
-# Install Node.js 20.x, wget, and ca-certificates
+# Install Node.js 22.x, wget, and ca-certificates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     curl \
     ca-certificates \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 

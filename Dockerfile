@@ -30,6 +30,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Add GitHub host key to known_hosts to prevent key verification failure
 RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+# Redirect git SSH URLs to HTTPS so public git dependencies can build without SSH keys
+RUN git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" && \
+    git config --global url."https://github.com/".insteadOf "git@github.com:"
+
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .npmrc ./

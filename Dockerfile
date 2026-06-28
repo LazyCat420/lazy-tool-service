@@ -31,8 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 # Redirect git SSH URLs to HTTPS so public git dependencies can build without SSH keys
-RUN git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" && \
-    git config --global url."https://github.com/".insteadOf "git@github.com:"
+RUN git config --system url."https://github.com/".insteadOf "ssh://git@github.com/" && \
+    git config --system url."https://github.com/".insteadOf "git@github.com:"
 
 WORKDIR /app
 COPY package.json package-lock.json ./

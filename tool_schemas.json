@@ -494,7 +494,7 @@
             "relevance",
             "date"
           ],
-          "description": "Optional sort order for search: 'relevance' (default) or 'date' (to get latest videos)."
+          "description": "Optional sort order for search: 'date' (default) or 'relevance'."
         },
         "limit": {
           "type": "integer",

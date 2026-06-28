@@ -4,8 +4,7 @@ Ontology / Brain Graph Tools.
 
 import json
 from app.tools.registry import registry, PermissionLevel
-def graph_learn(*args, **kwargs):
-    return {"status": "ok", "message": "graph_learn stub"}
+from app.cognition.ontology.graph_learn_tool import graph_learn
 
 @registry.register(
     name="graph_learn",

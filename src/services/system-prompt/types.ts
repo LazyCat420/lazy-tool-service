@@ -60,6 +60,7 @@ export interface AssemblerContext {
   locale?: string;
   _injectedSkills?: string[];
   _currentMessages?: Array<Record<string, unknown>>;
+  loadedTools?: Set<string>;
   [key: string]: unknown;
 }
 

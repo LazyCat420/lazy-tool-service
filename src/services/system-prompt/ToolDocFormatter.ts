@@ -43,6 +43,7 @@ export class ToolDocFormatter {
     lockedOffToolNames?: Set<string>,
     compact?: boolean,
     locale = "en",
+    loadedTools?: Set<string>,
   ): string {
     const schemas = ToolOrchestratorService.getClientToolSchemas(
       defaultTopology,
@@ -59,7 +60,7 @@ export class ToolDocFormatter {
           (toolSchema) => !lockedOffToolNames.has(toolSchema.name),
         );
       }
-      return this._formatToolDescriptions(filteredSchemas, compact, locale);
+      return this._formatToolDescriptions(filteredSchemas, compact, locale, loadedTools);
     }
 
     if (!enabledTools) {
@@ -69,7 +70,7 @@ export class ToolDocFormatter {
           (toolSchema) => !lockedOffToolNames.has(toolSchema.name),
         );
       }
-      return this._formatToolDescriptions(allSchemas, compact, locale);
+      return this._formatToolDescriptions(allSchemas, compact, locale, loadedTools);
     }
 
     const hasPrefixed = enabledTools.some(
@@ -110,13 +111,14 @@ export class ToolDocFormatter {
       );
     }
 
-    return this._formatToolDescriptions(filteredSchemas, compact, locale);
+    return this._formatToolDescriptions(filteredSchemas, compact, locale, loadedTools);
   }
 
   private _formatToolDescriptions(
     filteredSchemas: ToolSchemaDescriptor[],
     compact?: boolean,
     locale = "en",
+    loadedTools = new Set<string>(),
   ): string {
     if (filteredSchemas.length === 0) return "";
 
@@ -134,10 +136,15 @@ export class ToolDocFormatter {
       const entries = domainTools.map((tool) => {
         const fullDescription = tool.description || "";
 
-        // In compact mode, truncate to first sentence only
-        const description = compact
+        // In compact mode or meta list mode, truncate to first sentence only
+        const isLoaded = tool.name === "describe_tools" || loadedTools.has(tool.name);
+        const description = (compact || !isLoaded)
           ? fullDescription.split(/(?<=[.!?])\s/)[0] || fullDescription
           : fullDescription;
+
+        if (!isLoaded) {
+          return `### ${tool.name}\n${description}\n  - (Parameters: CALL describe_tools(["${tool.name}"]) first to retrieve parameter schema before invoking this tool.)`;
+        }
 
         const parameters = tool.parameters?.properties || {};
         const parameterNames = Object.keys(parameters);

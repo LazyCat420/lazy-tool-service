@@ -175,6 +175,7 @@ export default class VisionLanguageHarness extends BaseAgenticHarness {
             workspaceRoot: workspaceRoot || undefined,
             workspaceEnabled: options.workspaceEnabled as boolean | undefined,
             locale: options.locale as string | undefined,
+            loadedTools: state.loadedTools,
           };
           await hooks.run("beforePrompt", hookContext);
 
@@ -222,7 +223,9 @@ export default class VisionLanguageHarness extends BaseAgenticHarness {
             `[PlanningMode] Sending ${planModeTools.length} tools to provider: ${planModeTools.map((tool: ToolSchema) => tool.name).join(", ")}`,
           );
         } else {
-          passOptions.tools = this.tools.finalTools;
+          passOptions.tools = this.tools.finalTools.filter(
+            (tool: ToolSchema) => tool.name === "describe_tools" || state.loadedTools.has(tool.name),
+          );
         }
 
         const resolvedPassTools = passOptions.tools || [];

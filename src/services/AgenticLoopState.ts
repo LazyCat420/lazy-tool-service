@@ -28,6 +28,7 @@ interface CriteriaScores {
 export default class AgenticLoopState {
   // ── Iteration tracking ──────────────────────────────────
   iterations: number;
+  loadedTools: Set<string>;
 
   // ── Usage / cost accumulation ────────────────────────────
   overallUsage: UsageAccumulator;
@@ -148,6 +149,7 @@ export default class AgenticLoopState {
 
     this.lastProgressEmitTime = 0;
     this.chunksSinceLastProgress = 0;
+    this.loadedTools = new Set();
   }
 
   /** Get clean display segments (trimmed, empty-filtered) for DB persistence. */

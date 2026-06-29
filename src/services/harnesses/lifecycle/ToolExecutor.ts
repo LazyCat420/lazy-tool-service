@@ -126,6 +126,15 @@ export async function executeToolBatch(
       );
       const durationMs = Date.now() - startTime;
       await hooks.run("afterToolCall", toolCall, result, context);
+
+      if (toolCall.name === "describe_tools" && toolCall.args && Array.isArray(toolCall.args.tool_names)) {
+        for (const name of toolCall.args.tool_names) {
+          if (typeof name === "string") {
+            state.loadedTools.add(name);
+          }
+        }
+      }
+
       return { name: toolCall.name, id: toolCall.id, result, durationMs };
     }),
   );

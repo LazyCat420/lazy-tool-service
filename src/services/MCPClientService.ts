@@ -2,6 +2,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import fs from "node:fs";
 import logger from "../utils/logger.ts";
 import { registerCleanup } from "../utils/CleanupRegistry.ts";
 import type { Db } from "mongodb";
@@ -168,6 +169,17 @@ function parseMCPToolName(
 function createTransport(
   config: MCPServerConfig,
 ): StdioClientTransport | StreamableHTTPClientTransport | SSEClientTransport {
+  let rawUrl = config.url || "";
+  const isDocker = fs.existsSync("/.dockerenv") || fs.existsSync("/opt/venv/bin/python");
+  if (!isDocker) {
+    if (rawUrl.includes(":5591")) {
+      rawUrl = rawUrl.replace(/:\/\/[^/]+:5591/, "://127.0.0.1:5591");
+    }
+    if (rawUrl.includes(":7778")) {
+      rawUrl = rawUrl.replace(/:\/\/[^/]+:7778/, "://127.0.0.1:7778");
+    }
+  }
+
   if (config.transport === "stdio") {
     return new StdioClientTransport({
       command: config.command!,
@@ -177,7 +189,7 @@ function createTransport(
   }
 
   if (config.transport === "streamable-http") {
-    const url = new URL(config.url!);
+    const url = new URL(rawUrl);
     return new StreamableHTTPClientTransport(url, {
       requestInit: {
         headers: config.headers || {},
@@ -186,7 +198,7 @@ function createTransport(
   }
 
   if (config.transport === "sse") {
-    const url = new URL(config.url!);
+    const url = new URL(rawUrl);
     return new SSEClientTransport(url, {
       requestInit: {
         headers: config.headers || {},

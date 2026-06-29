@@ -208,6 +208,11 @@ app.use("/webhooks", webhookRouter);
 
 // Tool executor compatibility routes
 app.use("/execute", executeRouter);
+
+import { PrismProxyService } from "./services/prism/PrismProxyService.js";
+app.use("/prism-proxy", async (req: Request, res: Response) => {
+  await PrismProxyService.handle(req, res);
+});
 app.use("/charts", express.static("data/charts"));
 mountMcpRoutes(app);
 

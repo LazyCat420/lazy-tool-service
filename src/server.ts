@@ -4,6 +4,7 @@ import logger from "./logger.js";
 import CONFIG, { MONGO_DB_NAME, MONGO_URI } from "../config.js";
 import executeRoutes, { executeTool } from "./routes/ExecuteRoutes.js";
 import AgentRoutes from "./routes/AgentRoutes.js";
+import configRouter, { localConfigRouter } from "./routes/ConfigRoutes.js";
 import { mountMcpRoutes } from "./services/McpAdapter.js";
 import MongoWrapper from "./wrappers/MongoWrapper.js";
 import AgentPersonaRegistry from "./services/AgentPersonaRegistry.js";
@@ -160,26 +161,8 @@ app.post(["/chat", "/v1/chat/completions"], apiLimiter, requireApiKey, async (re
 });
 
 // Compatibility endpoints for apps expecting Prism API contract
-app.get("/config", apiLimiter, requireApiKey, (_req: Request, res: Response) => {
-  res.json({
-    textToText: {
-      models: {
-        google: [
-          { name: "gemini-2.0-flash-exp", label: "Gemini 2.0 Flash Exp" },
-          { name: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
-          { name: "gemini-1.5-flash", label: "Gemini 1.5 Flash" }
-        ],
-        openai: [
-          { name: "gpt-4o", label: "GPT-4o" },
-          { name: "gpt-4o-mini", label: "GPT-4o Mini" }
-        ],
-        anthropic: [
-          { name: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet" }
-        ]
-      }
-    }
-  });
-});
+app.use("/config", apiLimiter, configRouter);
+app.use("/config-local", apiLimiter, localConfigRouter);
 
 app.post("/audio-to-text", apiLimiter, requireApiKey, async (req: Request, res: Response) => {
   const { audio, audioUrl } = req.body;

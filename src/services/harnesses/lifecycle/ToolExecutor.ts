@@ -46,6 +46,16 @@ export async function executeToolBatch(
     toolCalls.map(async (toolCall) => {
       await hooks.run("beforeToolCall", toolCall, context);
 
+      if (toolCall.isUnauthorized) {
+        const result = {
+          success: false,
+          error: "PERMISSION_DENIED",
+          message: `The tool "${toolCall.name}" is not whitelisted for your agent role. You must reason using the data in the 'Pre-Collected Data Report' instead of calling unauthorized tools.`,
+        };
+        await hooks.run("afterToolCall", toolCall, result, context);
+        return { name: toolCall.name, id: toolCall.id, result, durationMs: 0 };
+      }
+
       if (ToolOrchestratorService.isStreamable(toolCall.name)) {
         const startTime = Date.now();
         const result = await ToolOrchestratorService.executeToolStreaming(

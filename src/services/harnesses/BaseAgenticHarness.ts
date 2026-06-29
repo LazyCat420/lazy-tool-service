@@ -784,6 +784,7 @@ export default class BaseAgenticHarness {
 
       // Schema enforcement
       const toolName = streamChunk.name || "";
+      let isUnauthorized = false;
       if (!allowedToolNames.has(toolName)) {
         if (this.tools.finalTools.some((t) => t.name === toolName)) {
           logger.info(
@@ -793,9 +794,9 @@ export default class BaseAgenticHarness {
           allowedToolNames.add(toolName);
         } else {
           logger.warn(
-            `[AgenticLoop] Dropped tool call "${toolName}" — not in schema: [${[...allowedToolNames].join(", ")}]`,
+            `[AgenticLoop] Unauthorized tool call "${toolName}" — not in schema: [${[...allowedToolNames].join(", ")}]`,
           );
-          return { action: "skip" };
+          isUnauthorized = true;
         }
       }
 
@@ -808,6 +809,7 @@ export default class BaseAgenticHarness {
         args: streamChunk.args || {},
         thoughtSignature: streamChunk.thoughtSignature || undefined,
         reasoningItem: streamChunk.reasoningItem || undefined,
+        isUnauthorized,
       };
       pass.pendingToolCalls.push(toolCall);
       state.streamedToolCalls.push({ ...toolCall });

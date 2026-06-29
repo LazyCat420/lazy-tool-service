@@ -51,6 +51,7 @@ export interface ToolCall {
   result?: unknown;
   status?: string;
   durationMs?: number;
+  isUnauthorized?: boolean;
 }
 
 export interface ToolResult {

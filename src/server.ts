@@ -90,7 +90,7 @@ app.use("/execute", apiLimiter, requireApiKey, executeRoutes);
 app.use("/agent", apiLimiter, requireApiKey, AgentRoutes);
 
 import { PrismProxyService } from "./services/prism/PrismProxyService.js";
-app.all("/prism-proxy/*", apiLimiter, requireApiKey, async (req: Request, res: Response) => {
+app.use("/prism-proxy", apiLimiter, requireApiKey, async (req: Request, res: Response) => {
   await PrismProxyService.handle(req, res);
 });
 

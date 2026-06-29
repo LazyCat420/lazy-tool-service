@@ -24,9 +24,13 @@ const SELF_BASE_URL = CONFIG.LAZY_TOOL_SERVICE_URL;
 async function executeTool(toolName: string, endpoint: ToolEndpoint, toolArguments: Record<string, unknown> = {}): Promise<unknown> {
   try {
     const url = `${SELF_BASE_URL}${endpoint.path}`;
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (CONFIG.LAZY_TOOL_SERVICE_API_KEY) {
+      headers["x-api-key"] = CONFIG.LAZY_TOOL_SERVICE_API_KEY;
+    }
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(toolArguments),
     });
     if (!response.ok) {

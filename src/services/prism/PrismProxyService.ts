@@ -51,6 +51,30 @@ export class PrismProxyService {
       body.enabledTools = allTools;
     }
 
+    // Apply Qwen non-leading system message rewrite patch (workaround for Qwen chat template constraint in vLLM)
+    if ((basePath === "/agent" || basePath === "/chat") && req.method === "POST" && body && Array.isArray(body.messages) && typeof body.model === "string") {
+      const modelName = body.model.toLowerCase();
+      if (modelName.includes("qwen")) {
+        let hasSeenFirstSystemMessage = false;
+        if (body === req.body) {
+          body = { ...req.body };
+        }
+        body.messages = body.messages.map((message: any) => {
+          if (message.role === "system") {
+            if (!hasSeenFirstSystemMessage) {
+              hasSeenFirstSystemMessage = true;
+              return message;
+            }
+            logger.warn(
+              `[PrismProxy] TEMP PATCH: Rewriting non-primary system message to user role for ${body.model} (Qwen vLLM chat template workaround)`
+            );
+            return { ...message, role: "user" };
+          }
+          return message;
+        });
+      }
+    }
+
     const streamQuery = req.query.stream;
     const acceptsSse = req.headers.accept?.includes("text/event-stream");
     const isStream = streamQuery === "true" || (acceptsSse && streamQuery !== "false" && req.body.stream !== false);

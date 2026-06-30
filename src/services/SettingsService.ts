@@ -84,7 +84,7 @@ const DEFAULTS: SettingsData = {
     imageProvider: PROVIDERS.GOOGLE,
     imageModel: MODELS.GEMINI_3_PRO_IMAGE.name,
     visionProvider: PROVIDERS.VLLM,
-    visionModel: "qwen3-vl-235b-a22b-instruct",
+    visionModel: "",
     textToSpeechProvider: PROVIDERS.ELEVENLABS,
     textToSpeechModel: "",
     speechToTextProvider: PROVIDERS.OPENAI,
@@ -151,7 +151,7 @@ const SettingsService = {
         creative.visionModel?.toLowerCase().includes("qwen")
       ) {
         creative.visionProvider = PROVIDERS.VLLM;
-        creative.visionModel = "qwen3-vl-235b-a22b-instruct";
+        creative.visionModel = "";
       }
     }
 

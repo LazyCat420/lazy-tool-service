@@ -388,6 +388,28 @@ async function prepareGenerationContext(
   let resolvedModel =
     requestedModel ||
     getDefaultModels(TYPES.TEXT, TYPES.TEXT)[providerName as string];
+
+  // Dynamic resolution for vLLM: if no model was resolved, fetch whatever is currently loaded
+  if (!resolvedModel && providerName.startsWith("vllm")) {
+    const siblings = getInstancesByType(providerName);
+    for (const sibling of siblings) {
+      const p = getProvider(sibling.id);
+      if (p && p.listModels) {
+        try {
+          const res = await p.listModels();
+          // Type assertion to any since the exact return type might vary slightly but usually has models or data
+          const models = (res as any)?.models || (res as any)?.data || [];
+          if (models.length > 0) {
+            resolvedModel = models[0].id || models[0].key || models[0].name;
+            providerName = sibling.id;
+            break;
+          }
+        } catch (e) {
+          logger.warn(`[ChatRoutes] Failed to dynamically fetch models for ${sibling.id}:`, e);
+        }
+      }
+    }
+  }
   if (localModelQueue.isLocal(providerName)) {
     const pinnedInstanceType = getInstanceType(providerName);
     const isInstancePinned = pinnedInstanceType !== null && pinnedInstanceType !== providerName;

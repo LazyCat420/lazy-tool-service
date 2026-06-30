@@ -45,7 +45,7 @@ export async function resolveLockedOffToolNames(): Promise<Set<string>> {
     creativeSettings?.imageProvider && creativeSettings?.imageModel,
   );
   const hasVisionModel = Boolean(
-    creativeSettings?.visionProvider && creativeSettings?.visionModel,
+    creativeSettings?.visionProvider && (creativeSettings?.visionModel || creativeSettings?.visionProvider.startsWith("vllm")),
   );
   const hasTextToSpeech = Boolean(
     creativeSettings?.textToSpeechProvider &&

@@ -30,6 +30,9 @@ PRE_BUILD() {
   step "Copying tool_schemas.json from lazy-tool-service"
   cp "${SCRIPT_DIR}/../lazy-tool-service/tool_schemas.json" "${SCRIPT_DIR}/tool_schemas.json"
 
+  step "Copying projects.json from vault-service"
+  cp "${SCRIPT_DIR}/../vault-service/projects.json" "${SCRIPT_DIR}/projects.json"
+
   step "Cleaning and staging Python files for Docker build..."
   rm -rf "${SCRIPT_DIR}/python"
   mkdir -p "${SCRIPT_DIR}/python/app"

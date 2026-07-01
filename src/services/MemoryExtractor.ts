@@ -1,7 +1,7 @@
 import { AGENT_IDS } from "@rodrigo-barraza/utilities-library/taxonomy";
 import crypto from "crypto";
 import { getProvider } from "../providers/index.ts";
-import { getInstancesByType } from "../providers/instance-registry.ts";
+import { getInstancesByType, getInstanceType } from "../providers/instance-registry.ts";
 import { resolveModelForInstances } from "../utils/ModelResolution.ts";
 import MemoryService, { CODING_MEMORY_TYPES } from "./MemoryService.ts";
 import MemoryConsolidationService from "./MemoryConsolidationService.ts";
@@ -163,21 +163,11 @@ export default class MemoryExtractor {
       let resolvedModel = extractionModel;
       let targetProviderId = extractionProvider;
 
-      let siblings = getInstancesByType(extractionProvider);
+      const baseType = getInstanceType(extractionProvider) || extractionProvider;
+      let siblings = getInstancesByType(baseType);
       let modelRes = await resolveModelForInstances(resolvedModel, siblings);
       let usable = modelRes.usable;
       let modelOverrides = modelRes.modelOverrides;
-
-      if (usable.length === 0 && extractionProvider.startsWith("vllm")) {
-        const otherProvider = extractionProvider === "vllm" ? "vllm-2" : "vllm";
-        const otherSiblings = getInstancesByType(otherProvider);
-        const otherRes = await resolveModelForInstances(resolvedModel, otherSiblings);
-        if (otherRes.usable.length > 0) {
-          usable = otherRes.usable;
-          modelOverrides = otherRes.modelOverrides;
-          targetProviderId = otherProvider;
-        }
-      }
 
       if (usable.length > 0) {
         targetProviderId = usable[0].id;

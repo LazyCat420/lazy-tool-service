@@ -3,6 +3,8 @@ import { daysSinceIso } from "@rodrigo-barraza/utilities-library";
 import { SERVER_SENT_EVENT_TYPES } from "@rodrigo-barraza/utilities-library/taxonomy";
 import crypto from "crypto";
 import { getProvider } from "../providers/index.ts";
+import { getInstancesByType, getInstanceType } from "../providers/instance-registry.ts";
+import { resolveModelForInstances } from "../utils/ModelResolution.ts";
 import type { ChatMessage } from "../types/provider.ts";
 import type { MessagePayload } from "./conversation/types.ts";
 import MemoryService from "./MemoryService.ts";
@@ -407,9 +409,30 @@ const MemoryConsolidationService = {
     );
 
     // Resolve the consolidation model
-    const { provider: consolidationProvider, model: consolidationModel } =
-      await getConsolidationConfig();
-    const provider = getProvider(consolidationProvider);
+    const config = await getConsolidationConfig();
+    let consolidationProvider = config.provider;
+    let consolidationModel = config.model;
+
+    let resolvedModel = consolidationModel;
+    let targetProviderId = consolidationProvider;
+
+    const baseType = getInstanceType(consolidationProvider) || consolidationProvider;
+    let siblings = getInstancesByType(baseType);
+    let modelRes = await resolveModelForInstances(resolvedModel, siblings);
+    let usable = modelRes.usable;
+    let modelOverrides = modelRes.modelOverrides;
+
+    if (usable.length > 0) {
+      targetProviderId = usable[0].id;
+      const override = modelOverrides.get(targetProviderId);
+      if (override) {
+        resolvedModel = override;
+      }
+    }
+
+    const provider = getProvider(targetProviderId);
+    consolidationProvider = targetProviderId;
+    consolidationModel = resolvedModel;
 
     // Build a lookup map for metadata preservation during merges
     const memoryLookup = new Map<string, MemoryDoc>(

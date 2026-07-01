@@ -422,12 +422,16 @@ const MemoryConsolidationService = {
     let usable = modelRes.usable;
     let modelOverrides = modelRes.modelOverrides;
 
-    if (usable.length > 0) {
-      targetProviderId = usable[0].id;
-      const override = modelOverrides.get(targetProviderId);
-      if (override) {
-        resolvedModel = override;
-      }
+    if (usable.length === 0) {
+      throw new Error(
+        `[MemoryConsolidation] Model resolution failed: "${consolidationModel}" is not loaded on any instances of provider type "${baseType}".`
+      );
+    }
+
+    targetProviderId = usable[0].id;
+    const override = modelOverrides.get(targetProviderId);
+    if (override) {
+      resolvedModel = override;
     }
 
     const provider = getProvider(targetProviderId);

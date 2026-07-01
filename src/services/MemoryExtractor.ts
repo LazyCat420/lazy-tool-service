@@ -169,12 +169,16 @@ export default class MemoryExtractor {
       let usable = modelRes.usable;
       let modelOverrides = modelRes.modelOverrides;
 
-      if (usable.length > 0) {
-        targetProviderId = usable[0].id;
-        const override = modelOverrides.get(targetProviderId);
-        if (override) {
-          resolvedModel = override;
-        }
+      if (usable.length === 0) {
+        throw new Error(
+          `[MemoryExtractor] Model resolution failed: "${extractionModel}" is not loaded on any instances of provider type "${baseType}".`
+        );
+      }
+
+      targetProviderId = usable[0].id;
+      const override = modelOverrides.get(targetProviderId);
+      if (override) {
+        resolvedModel = override;
       }
 
       const provider = getProvider(targetProviderId);

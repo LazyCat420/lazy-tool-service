@@ -614,7 +614,7 @@ export async function runGraphOfThoughts(
         break;
       }
 
-      if (!synthesizedPass.streamedText && synthesizedPass.streamedThinking.trim()) {
+      if (!synthesizedPass.streamedText && (!synthesizedPass.pendingToolCalls || !synthesizedPass.pendingToolCalls.length) && synthesizedPass.streamedThinking.trim()) {
         logger.warn(
           `[GraphOfThoughts] Thinking-only response on iteration ${state.iterations} — ` +
             `thinking=${synthesizedPass.streamedThinking.length}chars, text=0. ` +

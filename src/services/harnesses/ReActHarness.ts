@@ -609,7 +609,7 @@ export default class ReActHarness extends BaseAgenticHarness {
           break;
         }
 
-        if (!pass.streamedText && pass.streamedThinking.trim()) {
+        if (!pass.streamedText && (!pass.pendingToolCalls || !pass.pendingToolCalls.length) && pass.streamedThinking.trim()) {
           // Thinking-only response: model spent its entire output budget on
           // extended thinking without producing visible text or tool calls.
           // This commonly happens with local models (e.g. Gemma on lm-studio)

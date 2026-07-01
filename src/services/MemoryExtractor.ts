@@ -185,9 +185,28 @@ export default class MemoryExtractor {
 
       // Build conversation text (compact format to save tokens)
       const conversationText = messages
-        .filter(
-          (message) => message.role === "user" || message.role === "assistant",
-        )
+        .filter((message) => {
+          if (message.role !== "user" && message.role !== "assistant") {
+            return false;
+          }
+          const content = (message.content || "").trim();
+          if (!content) {
+            return false;
+          }
+          if (content === "[tool-only turn]" || content === "[Component]") {
+            return false;
+          }
+          // Filter out system warning loop messages disguised as user messages
+          if (
+            message.role === "user" &&
+            (content.startsWith("[System:") ||
+              content.includes("Your previous response contained only internal reasoning") ||
+              content.includes("Do not repeat your reasoning"))
+          ) {
+            return false;
+          }
+          return true;
+        })
         .map((message) => {
           const content = message.content || "";
           // Truncate very long messages to save tokens

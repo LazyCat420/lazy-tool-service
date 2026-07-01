@@ -876,7 +876,7 @@ export async function runTreeOfThoughts(
         break;
       }
 
-      if (!selectedPass.streamedText && selectedPass.streamedThinking.trim()) {
+      if (!selectedPass.streamedText && (!selectedPass.pendingToolCalls || !selectedPass.pendingToolCalls.length) && selectedPass.streamedThinking.trim()) {
         logger.warn(
           `[TreeOfThoughts] Thinking-only response on iteration ${state.iterations} — ` +
             `thinking=${selectedPass.streamedThinking.length}chars, text=0. ` +

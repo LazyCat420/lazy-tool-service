@@ -553,7 +553,7 @@ export default class VisionLanguageHarness extends BaseAgenticHarness {
           break;
         }
 
-        if (!pass.streamedText && pass.streamedThinking.trim()) {
+        if (!pass.streamedText && (!pass.pendingToolCalls || !pass.pendingToolCalls.length) && pass.streamedThinking.trim()) {
           logger.warn(
             `[VisionLanguageHarness] Thinking-only response on iteration ${state.iterations} — ` +
               `thinking=${pass.streamedThinking.length}chars, text=0. ` +
